@@ -6,14 +6,20 @@ This document provides a technical overview of ArduinoSim, a browser-based simul
 
 ArduinoSim is a static client-side web application. It runs entirely in the browser using HTML, CSS, and JavaScript, with no backend server required. It is designed to be hosted on GitHub Pages.
 
-The system is composed of several independent layers:
-1.  **UI & Layout:** A standard 3-column flexbox/grid layout (Sidebar, Code Editor, Simulator).
-2.  **Simulator (p5.js):** The 2D top-down physics and rendering engine for the virtual car and arenas.
-3.  **Code Editors:** 
-    -   Blockly for visual block-based programming.
-    -   Monaco Editor for Python and Arduino C++ text-based programming.
-    -   Pyodide for executing Python code in the browser.
-4.  **Hardware Bridge:** Web Serial API implementation to communicate with an Arduino Uno over USB.
+## Implementation Snapshot
+
+What is implemented now:
+1.  **UI & Layout:** 3-column shell with a Blockly workspace, simulator panel, and top controls.
+2.  **Simulator (p5.js):** Basic 2D top-down car rendering and open-arena movement.
+3.  **Blockly Layer:** Block definitions, Blockly workspace setup, and JS code generation for run-time execution.
+
+What is planned but not implemented yet:
+1.  **Python and C++ Editors:** Monaco-based text editors and Pyodide bridge.
+2.  **Progression:** Missions, XP, and block unlock logic.
+3.  **Arena Expansion:** Obstacle/line arenas and live sensor readouts.
+4.  **Hardware Bridge:** Web Serial API communication with an Arduino Uno over USB.
+
+The rest of this guide describes the intended architecture so the missing pieces can be added consistently.
 
 ## Core API Contract
 
@@ -31,6 +37,8 @@ Because movement takes time, the internal `Car` methods return Promises. This al
 -   `stop()`: Immediately halts all motor activity.
 -   `distance()`: Returns the distance in cm from the ultrasonic sensor.
 -   `onLine()`: Returns a boolean indicating if the IR sensor detects the line.
+
+In the current prototype, `distance()` and `onLine()` are still placeholders.
 
 ## Project Structure
 

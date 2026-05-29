@@ -1,6 +1,6 @@
 # Arduino-Sim
 
-A progressive, browser-based simulator and coding environment for the Elegoo Smart Robot Car Kit. Students can program a virtual car using drag-and-drop blocks, then seamlessly graduate to Python and Arduino C++ before flashing their logic to physical hardware.
+A progressive, browser-based simulator and coding environment for the Elegoo Smart Robot Car Kit. Students can program a virtual car using drag-and-drop blocks, with Python and Arduino C++ planned as the next steps before flashing logic to physical hardware.
 
 ## Documentation
 
@@ -10,17 +10,19 @@ A progressive, browser-based simulator and coding environment for the Elegoo Sma
 
 ## Current Project Status
 
-**Current Stage: Phase 2 (Block Coding Layer) — COMPLETED**
+**Current Stage: Phase 2 (Block Coding Layer) — IN PROGRESS**
 
-We are tracking progress against the 6 build phases outlined in `PLAN.md`.
+What exists today:
 
 *   [x] **Phase 0:** Scaffold repo, structure, and CDNs
-*   [x] **Phase 1:** Core Simulation (Car logic, basic open arena, p5.js integration)
-*   [x] **Phase 2:** Block Coding Layer (Blockly integration, block definitions)
+*   [x] **Phase 1:** Core Simulation (basic open arena, car movement, p5.js integration)
+*   [x] **Phase 2:** Block Coding Layer (Blockly blocks + JS codegen + run button)
 *   [ ] **Phase 3:** Python + C++ Editors (Monaco, Pyodide bridge)
-*   [ ] **Phase 4:** Missions + XP (Progression system, unlock gates)
-*   [ ] **Phase 5:** Arena Types + Sensors (Line/obstacle tracks, virtual ultrasonic/IR)
+*   [ ] **Phase 4:** Missions + XP (progression system, unlock gates)
+*   [ ] **Phase 5:** Arena Types + Sensors (line/obstacle tracks, virtual ultrasonic/IR)
 *   [ ] **Phase 6:** Serial Bridge (Web Serial API, Elegoo physical integration)
+
+The roadmap in `PLAN.md` is still the target vision; the later phases are not implemented yet.
 
 ## Running Locally
 

@@ -1,6 +1,6 @@
 # ArduinoSim Student Tutorial
 
-Welcome to ArduinoSim. This guide will teach you how to write code to control a robot car, starting with visual blocks and ending with real text-based code that runs on a physical machine.
+Welcome to ArduinoSim. This guide describes the intended learning path: visual blocks first, then Python, then Arduino C++. In the current build, the blocks-and-simulator experience is the part that is actually available.
 
 ## Getting to Know the Workspace
 
@@ -27,15 +27,15 @@ If the car did not reach the finish line, change the number to something larger 
 
 ## Levelling Up
 
-As you complete missions, you will earn Experience Points (XP). When you earn enough XP, you will level up. Levelling up unlocks new blocks.
+XP, missions, and unlocks are part of the planned progression system. They are not fully implemented yet.
 
--   **Level 2** gives you blocks to turn the car.
--   **Level 3** gives you blocks to change the car speed and make the program wait.
--   **Level 4** gives you blocks to read the ultrasonic distance sensor.
--   **Level 5** gives you loops to repeat actions forever, and blocks to follow lines on the ground.
+-   **Level 2** will give you blocks to turn the car.
+-   **Level 3** will give you blocks to change the car speed and make the program wait.
+-   **Level 4** will give you blocks to read the ultrasonic distance sensor.
+-   **Level 5** will give you loops to repeat actions forever, and blocks to follow lines on the ground.
 
 ## Moving to Text Code
 
 Once you master blocks, you can switch the coding mode at the top of the screen to Python. When you do this, you will see exactly how your block program looks in Python code. You can even type Python directly. 
 
-Eventually, you will unlock C++ mode. This is the exact language that physical Arduino robots understand. You can write your code here, click Connect Car, plug in a real Elegoo Robot Car using a USB cable, and watch the physical robot execute the exact same instructions you practiced in the simulator.
+Eventually, you will unlock C++ mode. This is the exact language that physical Arduino robots understand. In the planned final version, you will be able to connect a real Elegoo Robot Car using a USB cable and run the same instructions on the physical robot.
