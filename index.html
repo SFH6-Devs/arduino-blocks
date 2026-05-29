@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArduinoSim</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="assets/styles.css">
+    
+    <!-- External Libraries (CDNs) -->
+    <!-- p5.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+    
+    <!-- Blockly -->
+    <script src="https://unpkg.com/blockly/blockly.min.js"></script>
+    
+    <!-- Pyodide -->
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+    
+    <!-- Monaco Editor Loader -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+    
+    <script>
+        // Setup Monaco environment
+        require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' }});
+        window.MonacoEnvironment = { getWorkerUrl: () => proxy };
+        let proxy = URL.createObjectURL(new Blob([`
+            self.MonacoEnvironment = {
+                baseUrl: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/'
+            };
+            importScripts('https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/base/worker/workerMain.js');
+        `], { type: 'text/javascript' }));
+    </script>
+</head>
+<body>
+    <div id="app">
+        <!-- Top Navigation / Mission Strip -->
+        <header id="top-bar">
+            <div id="mission-strip">Mission 1: Drive Forward</div>
+            <div id="controls">
+                <button id="run-btn">▶ Run</button>
+                <button id="reset-btn">↺ Reset</button>
+                <button id="connect-btn">Connect Car</button>
+            </div>
+            <div id="mode-toggle">
+                <button class="active" data-mode="blocks">Blocks</button>
+                <button data-mode="python">Python</button>
+                <button data-mode="cpp">C++</button>
+            </div>
+        </header>
+
+        <main id="workspace-container">
+            <!-- Left: Category Sidebar + Block Palette -->
+            <aside id="left-sidebar">
+                <div id="block-categories"></div>
+                <div id="block-palette"></div>
+            </aside>
+
+            <!-- Centre: Block Workspace or Code Editor -->
+            <section id="centre-workspace">
+                <div id="blockly-div"></div>
+                <div id="monaco-editor" style="display: none;"></div>
+            </section>
+
+            <!-- Right: Sim Canvas, Sensors, Console -->
+            <aside id="right-panel">
+                <div id="sim-canvas-container">
+                    <!-- p5.js canvas will be injected here -->
+                </div>
+                <div id="sensors-panel">
+                    <div class="sensor" id="sensor-distance">Distance: --</div>
+                    <div class="sensor" id="sensor-line">Line: --</div>
+                    <div class="sensor" id="sensor-motor-l">Motor L: 0%</div>
+                    <div class="sensor" id="sensor-motor-r">Motor R: 0%</div>
+                </div>
+                <div id="console-panel">
+                    <pre id="console-output"></pre>
+                </div>
+                <div id="xp-bar-container">
+                    <div id="xp-bar">
+                        <div id="xp-progress"></div>
+                        <span id="xp-text">0 XP - Level 1</span>
+                    </div>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <!-- Main Module -->
+    <script type="module" src="main.js"></script>
+</body>
+</html>
