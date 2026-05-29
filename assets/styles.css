@@ -1,9 +1,10 @@
 :root {
-    --bg-dark: #1a1c2e;
+    --bg-dark: #121420;
     --accent-neon: #4af09a;
+    --accent-red: #ff4d4d;
     --text-main: #ffffff;
-    --panel-bg: #22253c;
-    --border-color: #313554;
+    --panel-bg: #1e2136;
+    --border-color: #2a2d45;
     
     /* Category colors */
     --cat-motion: #4d97ff;
@@ -16,7 +17,7 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: system-ui, -apple-system, sans-serif;
+    font-family: 'Outfit', system-ui, -apple-system, sans-serif;
 }
 
 body {
@@ -37,32 +38,35 @@ body {
 }
 
 header#top-bar {
-    height: 60px;
+    height: 70px;
     background-color: var(--panel-bg);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 20px;
+    padding: 0 30px;
     border-bottom: 2px solid var(--border-color);
 }
 
 #mission-strip {
-    font-weight: bold;
-    color: var(--accent-neon);
-    font-size: 1.2rem;
-    text-transform: uppercase;
+    font-weight: 900;
+    color: var(--text-main);
+    font-size: 1.5rem;
     letter-spacing: 1px;
+}
+#mission-strip span {
+    color: var(--accent-neon);
 }
 
 #controls button {
     background-color: var(--panel-bg);
     color: var(--text-main);
     border: 2px solid var(--border-color);
-    padding: 8px 16px;
-    margin: 0 5px;
-    border-radius: 6px;
+    padding: 10px 20px;
+    margin: 0 8px;
+    border-radius: 8px;
     cursor: pointer;
-    font-weight: bold;
+    font-weight: 900;
+    font-size: 1.1rem;
     transition: all 0.2s;
 }
 
@@ -70,30 +74,33 @@ header#top-bar {
     background-color: var(--accent-neon);
     color: var(--bg-dark);
     border-color: var(--accent-neon);
+    transform: translateY(-2px);
 }
 
 #controls button#run-btn {
-    color: var(--accent-neon);
-    border-color: var(--accent-neon);
-}
-
-#controls button#run-btn:hover {
     background-color: var(--accent-neon);
     color: var(--bg-dark);
+    border-color: var(--accent-neon);
+    box-shadow: 0 4px 10px rgba(74, 240, 154, 0.3);
+}
+#controls button#run-btn:hover {
+    box-shadow: 0 6px 15px rgba(74, 240, 154, 0.5);
 }
 
 #mode-toggle button {
     background: none;
     border: none;
-    color: #888;
-    padding: 10px;
+    color: #6b6e8a;
+    padding: 10px 15px;
     cursor: pointer;
-    font-weight: bold;
+    font-weight: 900;
+    font-size: 1.1rem;
+    transition: color 0.2s;
 }
 
 #mode-toggle button.active {
     color: var(--text-main);
-    border-bottom: 2px solid var(--accent-neon);
+    border-bottom: 3px solid var(--accent-neon);
 }
 
 #workspace-container {
@@ -108,16 +115,78 @@ aside#left-sidebar {
     border-right: 2px solid var(--border-color);
     display: flex;
     flex-direction: column;
+    z-index: 100;
+}
+
+#block-categories {
+    padding: 20px 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.category-btn {
+    display: flex;
+    align-items: center;
+    background: transparent;
+    border: none;
+    color: var(--text-main);
+    font-weight: 700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 12px;
+    border-radius: 8px;
+    transition: background 0.2s, transform 0.1s;
+}
+.category-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+.category-btn:active {
+    transform: scale(0.98);
+}
+.category-btn.active {
+    background: rgba(255, 255, 255, 0.1);
+}
+.category-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    margin-right: 15px;
+    box-shadow: 0 3px 5px rgba(0,0,0,0.4) inset, 0 1px 2px rgba(255,255,255,0.1);
 }
 
 section#centre-workspace {
     flex: 1;
     position: relative;
-    background-color: #1e2136;
+    background-color: #121420;
+}
+
+#workspace-watermark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    pointer-events: none;
+    z-index: 50;
+    color: rgba(255,255,255,0.4);
+    transition: opacity 0.3s;
+}
+#workspace-watermark h1 {
+    font-size: 4rem;
+    font-weight: 900;
+    margin-bottom: 10px;
+    color: rgba(255,255,255,0.05);
+    text-transform: uppercase;
+}
+#workspace-watermark p {
+    font-size: 1.5rem;
+    margin-bottom: 5px;
 }
 
 aside#right-panel {
-    width: 400px;
+    width: 45vw; /* Much wider simulator */
+    max-width: 700px;
+    min-width: 400px;
     background-color: var(--panel-bg);
     border-left: 2px solid var(--border-color);
     display: flex;
@@ -125,10 +194,10 @@ aside#right-panel {
 }
 
 #sim-canvas-container {
-    flex: 0 0 300px;
+    flex: 2; /* 66% of vertical space */
     border-bottom: 2px solid var(--border-color);
     position: relative;
-    background-color: #0b0d17;
+    background-color: #000;
 }
 
 #sim-canvas-container canvas {
@@ -138,55 +207,67 @@ aside#right-panel {
 }
 
 #sensors-panel {
-    padding: 10px;
+    padding: 15px;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    gap: 15px;
     border-bottom: 2px solid var(--border-color);
+    background-color: var(--panel-bg);
 }
 
 .sensor {
     background-color: var(--bg-dark);
-    padding: 10px;
-    border-radius: 6px;
+    padding: 15px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #888;
+    display: flex;
+    justify-content: space-between;
+}
+.sensor span {
+    color: var(--text-main);
     font-family: monospace;
-    color: var(--accent-neon);
+    font-weight: 900;
+    font-size: 1.2rem;
 }
 
 #console-panel {
-    flex: 1;
-    padding: 10px;
+    flex: 0.5;
+    padding: 15px;
     overflow-y: auto;
     background-color: var(--bg-dark);
     font-family: monospace;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
 }
 
 #console-output {
     margin: 0;
-    color: #ccc;
+    color: #6b6e8a;
     white-space: pre-wrap;
 }
 
 #xp-bar-container {
-    padding: 15px;
+    padding: 15px 20px;
     background-color: var(--panel-bg);
     border-top: 2px solid var(--border-color);
 }
 
 #xp-bar {
-    height: 20px;
+    height: 24px;
     background-color: var(--bg-dark);
-    border-radius: 10px;
+    border-radius: 12px;
     position: relative;
     overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
 }
 
 #xp-progress {
     height: 100%;
-    width: 0%;
-    background-color: var(--accent-neon);
+    width: 20%;
+    background-color: var(--cat-loops);
     transition: width 0.3s ease;
+    box-shadow: 0 0 10px var(--cat-loops);
 }
 
 #xp-text {
@@ -194,8 +275,70 @@ aside#right-panel {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 0.8rem;
-    font-weight: bold;
+    font-size: 0.9rem;
+    font-weight: 900;
+    color: #000;
+}
+
+/* BLOCKLY */
+.blocklyToolboxDiv { display: none !important; }
+.blocklySvg { background-color: transparent !important; }
+.blocklyMainBackground { fill: transparent !important; stroke: none !important; }
+.blocklyPathLight { display: none; }
+.blocklyPath {
+    filter: drop-shadow(0px 5px 0px rgba(0,0,0,0.3));
+    stroke: rgba(0,0,0,0.2) !important;
+    stroke-width: 1.5px !important;
+}
+.blocklyText {
+    font-family: 'Outfit', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 13pt !important;
+    fill: #ffffff !important;
+}
+/* Editable input bubbles (like Scratch) */
+.blocklyEditableText > rect, .blocklyFieldRect {
+    fill: #ffffff !important;
+    fill-opacity: 1 !important;
+    stroke: none !important;
+    rx: 15px !important;
+    ry: 15px !important;
+}
+/* Text inside the editable inputs should be black */
+.blocklyEditableText text, .blocklyFieldText {
+    fill: #000000 !important;
+}
+.blocklyFlyoutBackground {
+    fill: var(--panel-bg) !important;
+    fill-opacity: 0.95 !important;
+}
+
+/* Toast */
+#toast-container {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1000;
+    pointer-events: none;
+}
+.toast {
+    background-color: var(--panel-bg);
     color: #fff;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+    padding: 15px 30px;
+    border-radius: 50px;
+    font-size: 1.2rem;
+    font-weight: 900;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    animation: toast-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 2px solid var(--border-color);
+}
+.toast.error { background-color: var(--accent-red); color: #fff; border: none; }
+.toast.success { background-color: var(--cat-loops); color: #000; border: none; }
+@keyframes toast-in {
+    from { opacity: 0; transform: translateY(20px) scale(0.9); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
 }

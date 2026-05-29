@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ArduinoSim</title>
     
-    <!-- CSS -->
+    <!-- Fonts and CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/styles.css">
     
     <!-- External Libraries (CDNs) -->
@@ -13,10 +14,17 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
     
     <!-- Blockly -->
-    <script src="https://unpkg.com/blockly/blockly.min.js"></script>
+    <script src="https://unpkg.com/blockly/blockly_compressed.js"></script>
+    <script src="https://unpkg.com/blockly/blocks_compressed.js"></script>
+    <script src="https://unpkg.com/blockly/javascript_compressed.js"></script>
+    <script src="https://unpkg.com/blockly/python_compressed.js"></script>
+    <script src="https://unpkg.com/blockly/msg/en.js"></script>
     
     <!-- Pyodide -->
     <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+    
+    <!-- Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
     
     <!-- Monaco Editor Loader -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
@@ -53,12 +61,34 @@
         <main id="workspace-container">
             <!-- Left: Category Sidebar + Block Palette -->
             <aside id="left-sidebar">
-                <div id="block-categories"></div>
-                <div id="block-palette"></div>
+                <div id="block-categories">
+                    <button class="category-btn active" data-cat="motion">
+                        <div class="category-dot" style="background-color: var(--cat-motion);"></div>
+                        Motion
+                    </button>
+                    <button class="category-btn" data-cat="control">
+                        <div class="category-dot" style="background-color: var(--cat-control);"></div>
+                        Control
+                    </button>
+                    <button class="category-btn" data-cat="sensing">
+                        <div class="category-dot" style="background-color: var(--cat-sensing);"></div>
+                        Sensing
+                    </button>
+                    <button class="category-btn" data-cat="loops">
+                        <div class="category-dot" style="background-color: var(--cat-loops);"></div>
+                        Loops
+                    </button>
+                </div>
+                <!-- The Blockly flyout will overlay next to this visually -->
             </aside>
 
             <!-- Centre: Block Workspace or Code Editor -->
             <section id="centre-workspace">
+                <div id="workspace-watermark">
+                    <h1>Mission 1</h1>
+                    <p>Drag a <span style="color: var(--cat-motion); font-weight: 900;">move forward</span> block here.</p>
+                    <p>Press <span style="color: var(--accent-neon); font-weight: 900;">▶ Run</span> to reach the finish line.</p>
+                </div>
                 <div id="blockly-div"></div>
                 <div id="monaco-editor" style="display: none;"></div>
             </section>
@@ -86,6 +116,9 @@
             </aside>
         </main>
     </div>
+
+    <!-- Toast UI -->
+    <div id="toast-container"></div>
 
     <!-- Main Module -->
     <script type="module" src="main.js"></script>
