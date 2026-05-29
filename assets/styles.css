@@ -1,0 +1,201 @@
+:root {
+    --bg-dark: #1a1c2e;
+    --accent-neon: #4af09a;
+    --text-main: #ffffff;
+    --panel-bg: #22253c;
+    --border-color: #313554;
+    
+    /* Category colors */
+    --cat-motion: #4d97ff;
+    --cat-control: #ffab19;
+    --cat-sensing: #5cb1d6;
+    --cat-loops: #ffca1a;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+
+#app {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+header#top-bar {
+    height: 60px;
+    background-color: var(--panel-bg);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+#mission-strip {
+    font-weight: bold;
+    color: var(--accent-neon);
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+#controls button {
+    background-color: var(--panel-bg);
+    color: var(--text-main);
+    border: 2px solid var(--border-color);
+    padding: 8px 16px;
+    margin: 0 5px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+#controls button:hover {
+    background-color: var(--accent-neon);
+    color: var(--bg-dark);
+    border-color: var(--accent-neon);
+}
+
+#controls button#run-btn {
+    color: var(--accent-neon);
+    border-color: var(--accent-neon);
+}
+
+#controls button#run-btn:hover {
+    background-color: var(--accent-neon);
+    color: var(--bg-dark);
+}
+
+#mode-toggle button {
+    background: none;
+    border: none;
+    color: #888;
+    padding: 10px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#mode-toggle button.active {
+    color: var(--text-main);
+    border-bottom: 2px solid var(--accent-neon);
+}
+
+#workspace-container {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+aside#left-sidebar {
+    width: 250px;
+    background-color: var(--panel-bg);
+    border-right: 2px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+}
+
+section#centre-workspace {
+    flex: 1;
+    position: relative;
+    background-color: #1e2136;
+}
+
+aside#right-panel {
+    width: 400px;
+    background-color: var(--panel-bg);
+    border-left: 2px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+}
+
+#sim-canvas-container {
+    flex: 0 0 300px;
+    border-bottom: 2px solid var(--border-color);
+    position: relative;
+    background-color: #0b0d17;
+}
+
+#sim-canvas-container canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+#sensors-panel {
+    padding: 10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.sensor {
+    background-color: var(--bg-dark);
+    padding: 10px;
+    border-radius: 6px;
+    font-family: monospace;
+    color: var(--accent-neon);
+}
+
+#console-panel {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+    background-color: var(--bg-dark);
+    font-family: monospace;
+    font-size: 0.9rem;
+}
+
+#console-output {
+    margin: 0;
+    color: #ccc;
+    white-space: pre-wrap;
+}
+
+#xp-bar-container {
+    padding: 15px;
+    background-color: var(--panel-bg);
+    border-top: 2px solid var(--border-color);
+}
+
+#xp-bar {
+    height: 20px;
+    background-color: var(--bg-dark);
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+}
+
+#xp-progress {
+    height: 100%;
+    width: 0%;
+    background-color: var(--accent-neon);
+    transition: width 0.3s ease;
+}
+
+#xp-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+}
