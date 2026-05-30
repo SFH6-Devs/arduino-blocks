@@ -7,15 +7,9 @@ let arena;
 let finishReported = false;
 let resizeObserver;
 
-const syncSimCanvas = () => {
-    const simP5 = window.simP5;
-    const simContainer = document.getElementById('sim-canvas-container');
-    if (!simP5 || !simContainer) return;
-
-    simP5.resizeCanvas(simContainer.clientWidth, simContainer.clientHeight);
-    if (arena) {
-        arena.width = simP5.width;
-        arena.height = simP5.height;
+const syncBlocklyLayout = () => {
+    if (window.blocklyWorkspace) {
+        Blockly.svgResize(window.blocklyWorkspace);
     }
 };
 
@@ -46,16 +40,11 @@ const sketch = (p) => {
         arena = new Arena(p, p.width, p.height);
         car = new Car(p.width / 2, p.height - 60);
         window.car = car;
-        window.simP5 = p;
 
         if (typeof ResizeObserver !== 'undefined') {
             resizeObserver = new ResizeObserver(() => {
-                syncSimCanvas();
-                if (window.blocklyWorkspace) {
-                    Blockly.svgResize(window.blocklyWorkspace);
-                }
+                syncBlocklyLayout();
             });
-            resizeObserver.observe(container);
             resizeObserver.observe(document.getElementById('centre-workspace'));
         }
     };
@@ -90,7 +79,7 @@ const sketch = (p) => {
     };
     
     p.windowResized = () => {
-        syncSimCanvas();
+        syncBlocklyLayout();
     };
 };
 
@@ -118,15 +107,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
     const syncBlockly = () => {
-        if (window.blocklyWorkspace) {
-            Blockly.svgResize(window.blocklyWorkspace);
-        }
+        syncBlocklyLayout();
     };
 
     const applyPanelSizes = () => {
         document.documentElement.style.setProperty('--left-panel-w', `${leftPanelWidth}px`);
         document.documentElement.style.setProperty('--right-panel-w', `${rightPanelWidth}px`);
-        syncSimCanvas();
         syncBlockly();
     };
 
