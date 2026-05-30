@@ -4,8 +4,17 @@ import { initWorkspace } from './editor/workspace.js';
 
 let car;
 let arena;
+let simLayer;
 let finishReported = false;
 let resizeObserver;
+
+const syncSimCanvas = () => {
+    const simP5 = window.simP5;
+    const simContainer = document.getElementById('sim-canvas-container');
+    if (!simP5 || !simContainer) return;
+
+    simP5.resizeCanvas(simContainer.clientWidth, simContainer.clientHeight);
+};
 
 const syncBlocklyLayout = () => {
     if (window.blocklyWorkspace) {
@@ -37,24 +46,35 @@ const sketch = (p) => {
         canvas.style('height', '100%');
         canvas.elt.style.objectFit = 'contain';
         
-        arena = new Arena(p, p.width, p.height);
-        car = new Car(p.width / 2, p.height - 60);
+        simLayer = p.createGraphics(800, 500);
+        arena = new Arena(simLayer, 800, 500);
+        car = new Car(arena.width / 2, arena.height - 60);
         window.car = car;
+        window.simP5 = p;
 
         if (typeof ResizeObserver !== 'undefined') {
             resizeObserver = new ResizeObserver(() => {
+                syncSimCanvas();
                 syncBlocklyLayout();
             });
+            resizeObserver.observe(document.getElementById('sim-canvas-container'));
             resizeObserver.observe(document.getElementById('centre-workspace'));
         }
     };
 
     p.draw = () => {
+        const scale = Math.min(p.width / arena.width, p.height / arena.height);
+        const drawW = arena.width * scale;
+        const drawH = arena.height * scale;
+        const offsetX = (p.width - drawW) / 2;
+        const offsetY = (p.height - drawH) / 2;
+
+        simLayer.background(20, 22, 35);
         arena.draw();
         
         if (car) {
             car.update(arena);
-            car.draw(p);
+            car.draw(simLayer);
             
             if (arena.checkFinish(car.x, car.y) && !finishReported && !car.crashed) {
                 finishReported = true;
@@ -76,9 +96,13 @@ const sketch = (p) => {
                 }
             }
         }
+
+        p.background(13, 16, 32);
+        p.image(simLayer, offsetX, offsetY, drawW, drawH);
     };
     
     p.windowResized = () => {
+        syncSimCanvas();
         syncBlocklyLayout();
     };
 };
@@ -113,6 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const applyPanelSizes = () => {
         document.documentElement.style.setProperty('--left-panel-w', `${leftPanelWidth}px`);
         document.documentElement.style.setProperty('--right-panel-w', `${rightPanelWidth}px`);
+        syncSimCanvas();
         syncBlockly();
     };
 

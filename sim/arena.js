@@ -1,8 +1,8 @@
 export class Arena {
     constructor(p, width, height) {
         this.p = p;
-        this.width = width;
-        this.height = height;
+        this.width = 800;
+        this.height = 500;
         this.padding = 10;
     }
     
