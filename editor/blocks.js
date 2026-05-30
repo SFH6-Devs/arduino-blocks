@@ -1,9 +1,4 @@
 export function defineBlocks() {
-    const motionColor = "#4d97ff";
-    const controlColor = "#ffab19";
-    const sensingColor = "#5cb1d6";
-    const loopColor = "#ffca1a";
-
     Blockly.defineBlocksWithJsonArray([
         {
             "type": "move_forward",
@@ -11,7 +6,7 @@ export function defineBlocks() {
             "args0": [{ "type": "field_number", "name": "TIME", "value": 1000 }],
             "previousStatement": null,
             "nextStatement": null,
-            "colour": motionColor,
+            "style": "motion_blocks",
             "tooltip": "Move the car forward for a specific time."
         },
         {
@@ -20,7 +15,7 @@ export function defineBlocks() {
             "args0": [{ "type": "field_number", "name": "TIME", "value": 1000 }],
             "previousStatement": null,
             "nextStatement": null,
-            "colour": motionColor
+            "style": "motion_blocks"
         },
         {
             "type": "turn_left",
@@ -28,7 +23,7 @@ export function defineBlocks() {
             "args0": [{ "type": "field_number", "name": "DEGREES", "value": 90 }],
             "previousStatement": null,
             "nextStatement": null,
-            "colour": motionColor
+            "style": "motion_blocks"
         },
         {
             "type": "turn_right",
@@ -36,7 +31,7 @@ export function defineBlocks() {
             "args0": [{ "type": "field_number", "name": "DEGREES", "value": 90 }],
             "previousStatement": null,
             "nextStatement": null,
-            "colour": motionColor
+            "style": "motion_blocks"
         },
         {
             "type": "set_speed",
@@ -44,14 +39,14 @@ export function defineBlocks() {
             "args0": [{ "type": "field_number", "name": "SPEED", "value": 5, "min": 1, "max": 10 }],
             "previousStatement": null,
             "nextStatement": null,
-            "colour": motionColor
+            "style": "motion_blocks"
         },
         {
             "type": "stop_car",
             "message0": "stop",
             "previousStatement": null,
             "nextStatement": null,
-            "colour": motionColor
+            "style": "motion_blocks"
         },
         {
             "type": "wait",
@@ -59,7 +54,7 @@ export function defineBlocks() {
             "args0": [{ "type": "field_number", "name": "TIME", "value": 1000 }],
             "previousStatement": null,
             "nextStatement": null,
-            "colour": controlColor
+            "style": "control_blocks"
         },
         {
             "type": "if_obstacle",
@@ -70,7 +65,7 @@ export function defineBlocks() {
             ],
             "previousStatement": null,
             "nextStatement": null,
-            "colour": controlColor
+            "style": "control_blocks"
         },
         {
             "type": "if_on_line",
@@ -81,19 +76,19 @@ export function defineBlocks() {
             ],
             "previousStatement": null,
             "nextStatement": null,
-            "colour": controlColor
+            "style": "control_blocks"
         },
         {
             "type": "distance",
             "message0": "distance",
             "output": "Number",
-            "colour": sensingColor
+            "style": "sensing_blocks"
         },
         {
             "type": "on_line",
             "message0": "on line?",
             "output": "Boolean",
-            "colour": sensingColor
+            "style": "sensing_blocks"
         },
         {
             "type": "repeat_times",
@@ -105,7 +100,7 @@ export function defineBlocks() {
             ],
             "previousStatement": null,
             "nextStatement": null,
-            "colour": loopColor
+            "style": "loop_blocks"
         },
         {
             "type": "forever",
@@ -115,7 +110,7 @@ export function defineBlocks() {
                 { "type": "input_statement", "name": "DO" }
             ],
             "previousStatement": null,
-            "colour": loopColor
+            "style": "loop_blocks"
         }
     ]);
 }

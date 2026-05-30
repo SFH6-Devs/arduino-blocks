@@ -27,7 +27,28 @@ export function initWorkspace() {
         renderer: 'zelos',
         theme: Blockly.Theme.defineTheme('arduinotheme', {
             'base': Blockly.Themes.Classic,
-            'blockStyles': {},
+            'blockStyles': {
+                'motion_blocks': {
+                    'colourPrimary': '#4d97ff',
+                    'colourSecondary': '#2b6fd4',
+                    'colourTertiary': '#1a4fa0'
+                },
+                'control_blocks': {
+                    'colourPrimary': '#ffab19',
+                    'colourSecondary': '#d4850a',
+                    'colourTertiary': '#a06000'
+                },
+                'sensing_blocks': {
+                    'colourPrimary': '#5cb1d6',
+                    'colourSecondary': '#3a8aad',
+                    'colourTertiary': '#1e6080'
+                },
+                'loop_blocks': {
+                    'colourPrimary': '#ffca1a',
+                    'colourSecondary': '#c99f00',
+                    'colourTertiary': '#927300'
+                }
+            },
             'categoryStyles': {},
             'componentStyles': {
                 'workspaceBackgroundColour': '#121420',
@@ -38,9 +59,9 @@ export function initWorkspace() {
                 'flyoutOpacity': 1
             },
             'fontStyle': {
-                'family': 'Outfit, sans-serif',
+                'family': 'Nunito, sans-serif',
                 'weight': 'bold',
-                'size': 13
+                'size': 14
             }
         })
     });
