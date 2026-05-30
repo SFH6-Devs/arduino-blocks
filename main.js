@@ -1,6 +1,7 @@
 import { Car } from './sim/car.js';
 import { Arena } from './sim/arena.js';
 import { initWorkspace } from './editor/workspace.js';
+import { clearConsole } from './ui/console.js';
 
 let car;
 let arena;
@@ -19,6 +20,9 @@ const syncSimCanvas = () => {
 const syncBlocklyLayout = () => {
     if (window.blocklyWorkspace) {
         Blockly.svgResize(window.blocklyWorkspace);
+    }
+    if (window.layoutActiveCodeEditor) {
+        window.layoutActiveCodeEditor();
     }
 };
 
@@ -111,10 +115,9 @@ new p5(sketch);
 
 document.getElementById('reset-btn').addEventListener('click', () => {
     if (car && arena) {
+        clearConsole();
         car.reset(arena.width / 2, arena.height - 60);
         finishReported = false;
-        // Optionally clear console
-        // document.getElementById('console-output').textContent = "";
     }
 });
 

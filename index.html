@@ -79,6 +79,17 @@
                         Loops
                     </button>
                 </div>
+                <section id="category-docs" aria-live="polite">
+                    <div class="docs-head">
+                        <h2 id="docs-title">Motion</h2>
+                        <p id="docs-summary">Movement blocks for driving the car around the arena.</p>
+                    </div>
+                    <div id="docs-snippet"></div>
+                    <div class="docs-links">
+                        <a id="student-doc-link" href="docs/student-tutorial.md" target="_blank" rel="noreferrer">Student Tutorial</a>
+                        <a id="developer-doc-link" href="docs/developer-guide.md" target="_blank" rel="noreferrer">Developer Guide</a>
+                    </div>
+                </section>
                 <!-- The Blockly flyout will overlay next to this visually -->
             </aside>
 
@@ -92,7 +103,10 @@
                     <p>Press <span style="color: var(--accent-neon); font-weight: 900;">▶ Run</span> to reach the finish line.</p>
                 </div>
                 <div id="blockly-div"></div>
-                <div id="monaco-editor" style="display: none;"></div>
+                <div id="monaco-editor">
+                    <div id="python-editor" class="editor-pane"></div>
+                    <div id="cpp-editor" class="editor-pane"></div>
+                </div>
             </section>
 
             <div class="panel-splitter" data-target="right" aria-hidden="true"></div>

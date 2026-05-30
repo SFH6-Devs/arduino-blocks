@@ -1,18 +1,158 @@
 import { defineBlocks } from './blocks.js';
 import { initGenerators } from './codegen.js';
+import {
+    getCppSource,
+    initCppEditor,
+    layoutCppEditor,
+    syncCppFromWorkspace
+} from './cpp-editor.js';
+import {
+    getPythonSource,
+    initPythonEditor,
+    layoutPythonEditor,
+    runPythonEditor,
+    syncPythonFromWorkspace
+} from './python-editor.js';
+import { appendConsoleLine, clearConsole, writeConsoleError } from '../ui/console.js';
 
 export function initWorkspace() {
     defineBlocks();
     initGenerators();
 
     const toolboxes = {
-        "motion": { "kind": "flyoutToolbox", "contents": [ { "kind": "block", "type": "move_forward" }, { "kind": "block", "type": "move_back" }, { "kind": "block", "type": "turn_left" }, { "kind": "block", "type": "turn_right" }, { "kind": "block", "type": "set_speed" }, { "kind": "block", "type": "stop_car" } ] },
-        "control": { "kind": "flyoutToolbox", "contents": [ { "kind": "block", "type": "wait" }, { "kind": "block", "type": "if_obstacle" }, { "kind": "block", "type": "if_on_line" } ] },
-        "sensing": { "kind": "flyoutToolbox", "contents": [ { "kind": "block", "type": "distance" }, { "kind": "block", "type": "on_line" } ] },
-        "loops": { "kind": "flyoutToolbox", "contents": [ { "kind": "block", "type": "repeat_times" }, { "kind": "block", "type": "forever" } ] }
+        motion: {
+            kind: 'flyoutToolbox',
+            contents: [
+                { kind: 'block', type: 'move_forward' },
+                { kind: 'block', type: 'move_back' },
+                { kind: 'block', type: 'turn_left' },
+                { kind: 'block', type: 'turn_right' },
+                { kind: 'block', type: 'set_speed' },
+                { kind: 'block', type: 'stop_car' }
+            ]
+        },
+        control: {
+            kind: 'flyoutToolbox',
+            contents: [
+                { kind: 'block', type: 'wait' },
+                { kind: 'block', type: 'if_obstacle' },
+                { kind: 'block', type: 'if_on_line' }
+            ]
+        },
+        sensing: {
+            kind: 'flyoutToolbox',
+            contents: [
+                { kind: 'block', type: 'distance' },
+                { kind: 'block', type: 'on_line' }
+            ]
+        },
+        loops: {
+            kind: 'flyoutToolbox',
+            contents: [
+                { kind: 'block', type: 'repeat_times' },
+                { kind: 'block', type: 'forever' }
+            ]
+        }
     };
 
     const blocklyDiv = document.getElementById('blockly-div');
+    const monacoEditor = document.getElementById('monaco-editor');
+    const pythonPane = document.getElementById('python-editor');
+    const cppPane = document.getElementById('cpp-editor');
+    const watermark = document.getElementById('workspace-watermark');
+    const docsTitle = document.getElementById('docs-title');
+    const docsSummary = document.getElementById('docs-summary');
+    const docsSnippet = document.getElementById('docs-snippet');
+    const modeButtons = Array.from(document.querySelectorAll('#mode-toggle button'));
+    const categoryButtons = Array.from(document.querySelectorAll('.category-btn'));
+
+    const docsByCategory = {
+        motion: {
+            title: 'Motion',
+            summary: 'Use these blocks to move the robot around the arena.',
+            snippetTitle: 'How to use',
+            bullets: [
+                'Start with `move forward` to test basic movement.',
+                'Use `set speed` before motion blocks if you want a slower or faster run.',
+                'Combine `turn left` and `turn right` with `repeat` to build routes.'
+            ],
+            code: [
+                'car.set_speed(5)',
+                'await car.forward(1000)',
+                'await car.turn_left(90)'
+            ],
+            note: 'These map to the same `car.*` API used in Python mode.'
+        },
+        control: {
+            title: 'Control',
+            summary: 'Use control blocks to pause and branch your program.',
+            snippetTitle: 'How to use',
+            bullets: [
+                'Use `wait` to give the car a pause between actions.',
+                '`if obstacle ahead` checks the ultrasonic sensor before running the nested blocks.',
+                '`if on line` is useful for line-following missions later on.'
+            ],
+            code: [
+                'if car.distance() < 20:',
+                '    await sleep(1)',
+                '    car.stop()'
+            ],
+            note: 'Control blocks are best when you want the robot to react to the arena.'
+        },
+        sensing: {
+            title: 'Sensing',
+            summary: 'Read the virtual sensors and make decisions from live values.',
+            snippetTitle: 'How to use',
+            bullets: [
+                '`distance` returns the current distance reading in centimetres.',
+                '`on line?` returns true or false for the line sensor.',
+                'Use sensing blocks inside `if` blocks to make smart movement.'
+            ],
+            code: [
+                'if car.distance() < 20:',
+                '    car.stop()'
+            ],
+            note: 'These are the same sensors students will later connect to hardware.'
+        },
+        loops: {
+            title: 'Loops',
+            summary: 'Repeat actions without copying the same blocks again and again.',
+            snippetTitle: 'How to use',
+            bullets: [
+                'Use `repeat` when you want a block sequence to run a fixed number of times.',
+                '`forever` keeps running the nested blocks until the program ends or the car stops.',
+                'Loops work well with motion and sensing blocks together.'
+            ],
+            code: [
+                'for i in range(4):',
+                '    await car.forward(500)',
+                '    await car.turn_right(90)'
+            ],
+            note: 'Loops are the bridge from simple block programs to real Python control flow.'
+        }
+    };
+
+    const renderDocs = (category) => {
+        const docs = docsByCategory[category];
+        if (!docs || !docsTitle || !docsSummary || !docsSnippet) return;
+
+        docsTitle.textContent = docs.title;
+        docsSummary.textContent = docs.summary;
+        docsSnippet.innerHTML = `
+            <article class="docs-card">
+                <h3>${docs.snippetTitle}</h3>
+                <ul>
+                    ${docs.bullets.map((bullet) => `<li>${bullet}</li>`).join('')}
+                </ul>
+                <div class="docs-code">${docs.code.join('\n')}</div>
+            </article>
+            <article class="docs-card">
+                <h3>Reference</h3>
+                <p>${docs.note}</p>
+            </article>
+        `;
+    };
+
     blocklyDiv.style.position = 'absolute';
     blocklyDiv.style.top = '0';
     blocklyDiv.style.left = '0';
@@ -20,48 +160,48 @@ export function initWorkspace() {
     blocklyDiv.style.height = '100%';
 
     const workspace = Blockly.inject(blocklyDiv, {
-        toolbox: toolboxes['motion'],
+        toolbox: toolboxes.motion,
         scrollbars: true,
         trashcan: true,
         move: { scrollbars: true, drag: true, wheel: true },
         renderer: 'zelos',
         theme: Blockly.Theme.defineTheme('arduinotheme', {
-            'base': Blockly.Themes.Classic,
-            'blockStyles': {
-                'motion_blocks': {
-                    'colourPrimary': '#4d97ff',
-                    'colourSecondary': '#2b6fd4',
-                    'colourTertiary': '#1a4fa0'
+            base: Blockly.Themes.Classic,
+            blockStyles: {
+                motion_blocks: {
+                    colourPrimary: '#4d97ff',
+                    colourSecondary: '#2b6fd4',
+                    colourTertiary: '#1a4fa0'
                 },
-                'control_blocks': {
-                    'colourPrimary': '#ffab19',
-                    'colourSecondary': '#d4850a',
-                    'colourTertiary': '#a06000'
+                control_blocks: {
+                    colourPrimary: '#ffab19',
+                    colourSecondary: '#d4850a',
+                    colourTertiary: '#a06000'
                 },
-                'sensing_blocks': {
-                    'colourPrimary': '#5cb1d6',
-                    'colourSecondary': '#3a8aad',
-                    'colourTertiary': '#1e6080'
+                sensing_blocks: {
+                    colourPrimary: '#5cb1d6',
+                    colourSecondary: '#3a8aad',
+                    colourTertiary: '#1e6080'
                 },
-                'loop_blocks': {
-                    'colourPrimary': '#ffca1a',
-                    'colourSecondary': '#c99f00',
-                    'colourTertiary': '#927300'
+                loop_blocks: {
+                    colourPrimary: '#ffca1a',
+                    colourSecondary: '#c99f00',
+                    colourTertiary: '#927300'
                 }
             },
-            'categoryStyles': {},
-            'componentStyles': {
-                'workspaceBackgroundColour': '#121420',
-                'toolboxBackgroundColour': '#1e2136',
-                'toolboxForegroundColour': '#fff',
-                'flyoutBackgroundColour': '#1e2136',
-                'flyoutForegroundColour': '#ccc',
-                'flyoutOpacity': 1
+            categoryStyles: {},
+            componentStyles: {
+                workspaceBackgroundColour: '#121420',
+                toolboxBackgroundColour: '#1e2136',
+                toolboxForegroundColour: '#fff',
+                flyoutBackgroundColour: '#1e2136',
+                flyoutForegroundColour: '#ccc',
+                flyoutOpacity: 1
             },
-            'fontStyle': {
-                'family': 'Nunito, sans-serif',
-                'weight': 'bold',
-                'size': 14
+            fontStyle: {
+                family: 'Nunito, sans-serif',
+                weight: 'bold',
+                size: 14
             }
         })
     });
@@ -69,48 +209,148 @@ export function initWorkspace() {
     window.blocklyWorkspace = workspace;
     window.runMode = 'blocks';
 
-    // Sidebar clicking
-    document.querySelectorAll('.category-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
-            const target = e.currentTarget;
+    const hasBlocks = () => workspace.getAllBlocks(false).length > 0;
+
+    const updateWatermark = () => {
+        watermark.classList.toggle('hidden', window.runMode !== 'blocks' || hasBlocks());
+    };
+
+    const layoutActiveEditor = () => {
+        if (window.runMode === 'python') {
+            layoutPythonEditor();
+        } else if (window.runMode === 'cpp') {
+            layoutCppEditor();
+        }
+    };
+
+    window.layoutActiveCodeEditor = layoutActiveEditor;
+
+    const syncCodeFromWorkspace = () => {
+        const pythonCode = Blockly.Python.workspaceToCode(workspace);
+        const cppBody = window.cppGenerator ? window.cppGenerator.workspaceToCode(workspace) : '';
+
+        syncPythonFromWorkspace(pythonCode);
+        syncCppFromWorkspace(cppBody);
+
+        window.generatedPython = getPythonSource();
+        window.generatedCpp = getCppSource();
+    };
+
+    const setMode = (mode) => {
+        window.runMode = mode;
+
+        blocklyDiv.classList.toggle('is-hidden', mode !== 'blocks');
+        monacoEditor.classList.toggle('is-visible', mode !== 'blocks');
+        pythonPane.classList.toggle('active', mode === 'python');
+        cppPane.classList.toggle('active', mode === 'cpp');
+
+        modeButtons.forEach((button) => {
+            button.classList.toggle('active', button.dataset.mode === mode);
+        });
+
+        updateWatermark();
+
+        if (document.activeElement && typeof document.activeElement.blur === 'function') {
+            document.activeElement.blur();
+        }
+
+        requestAnimationFrame(() => {
+            Blockly.svgResize(workspace);
+            layoutActiveEditor();
+        });
+    };
+
+    categoryButtons.forEach((button) => {
+        button.addEventListener('click', (event) => {
+            categoryButtons.forEach((categoryButton) => categoryButton.classList.remove('active'));
+            const target = event.currentTarget;
             target.classList.add('active');
             workspace.updateToolbox(toolboxes[target.getAttribute('data-cat')]);
+            renderDocs(target.getAttribute('data-cat'));
         });
     });
 
-    window.addEventListener('resize', () => Blockly.svgResize(workspace), false);
+    modeButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+            setMode(button.dataset.mode);
+        });
+    });
 
-    // Run Logic
+    window.addEventListener('resize', () => {
+        Blockly.svgResize(workspace);
+        layoutActiveEditor();
+    }, false);
+
     document.getElementById('run-btn').addEventListener('click', async () => {
-        if (window.runMode !== 'blocks') return;
-        
-        // Hide watermark if it's there (should be hidden by now, but just in case)
-        document.getElementById('workspace-watermark').style.opacity = '0';
-        
-        const code = Blockly.JavaScript.workspaceToCode(workspace);
-        
-        if (!code.trim()) {
-            if (window.showToast) window.showToast("Add some blocks first!", "error");
+        clearConsole();
+
+        if (window.runMode === 'blocks') {
+            const code = Blockly.JavaScript.workspaceToCode(workspace);
+
+            if (!code.trim()) {
+                appendConsoleLine('Add some blocks first.');
+                if (window.showToast) window.showToast('Add some blocks first!', 'error');
+                return;
+            }
+
+            try {
+                const asyncFn = new Function(`return (async () => { ${code} })();`);
+                await asyncFn();
+            } catch (error) {
+                console.error(error);
+                writeConsoleError(error);
+                if (window.showToast) window.showToast('Error running code', 'error');
+            }
+
             return;
         }
 
-        try {
-            const asyncFn = new Function(`return (async () => { ${code} })();`);
-            await asyncFn();
-        } catch (e) {
-            console.error(e);
-            if (window.showToast) window.showToast("Error running code", "error");
+        if (window.runMode === 'python') {
+            const source = getPythonSource();
+            if (!source.trim()) {
+                appendConsoleLine('Add some Python code first.');
+                if (window.showToast) window.showToast('Add some Python code first!', 'error');
+                return;
+            }
+
+            try {
+                await runPythonEditor();
+            } catch (error) {
+                console.error(error);
+                if (window.showToast) window.showToast('Error running Python code', 'error');
+            }
+
+            return;
+        }
+
+        if (window.runMode === 'cpp') {
+            const source = getCppSource();
+            if (!source.trim()) {
+                appendConsoleLine('Add some C++ code first.');
+                if (window.showToast) window.showToast('Add some C++ code first!', 'error');
+                return;
+            }
+
+            appendConsoleLine('C++ mode is preview-only for now. The sketch is generated and highlighted, but it does not execute yet.');
+            if (window.showToast) window.showToast('C++ mode is preview only', 'error');
         }
     });
 
-    // Hide watermark when blocks are added
-    workspace.addChangeListener((e) => {
-        if (e.type === Blockly.Events.BLOCK_CREATE) {
-            const wm = document.getElementById('workspace-watermark');
-            if (wm) wm.style.opacity = '0';
+    workspace.addChangeListener((event) => {
+        if (event.type === Blockly.Events.BLOCK_CREATE) {
+            watermark.classList.add('hidden');
         }
-        if (e.isUiEvent) return;
-        window.generatedPython = Blockly.Python.workspaceToCode(workspace);
+
+        if (event.isUiEvent) return;
+
+        syncCodeFromWorkspace();
+        updateWatermark();
     });
+
+    void initPythonEditor().catch((error) => console.error(error));
+    void initCppEditor().catch((error) => console.error(error));
+
+    syncCodeFromWorkspace();
+    renderDocs('motion');
+    setMode('blocks');
 }

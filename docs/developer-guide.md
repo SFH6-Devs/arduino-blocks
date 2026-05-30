@@ -68,3 +68,13 @@ To add a new arena:
 2.  Implement a specific `draw()` method.
 3.  Update the collision logic in `checkWall()` to account for internal obstacles or track boundaries.
 4.  Register the new arena in `main.js`.
+
+## Testing And Verification
+
+Recommended checks before shipping a change:
+
+1.  Run `git diff --check` to catch whitespace and patch formatting mistakes.
+2.  Run a Node module-graph smoke check to parse and link the JavaScript files.
+3.  Open the app in a browser and confirm the active mode, simulator, and console behave as expected.
+
+The Node check is useful for catching syntax and import regressions early, but it does not replace a real browser smoke test because this app depends on p5.js, Blockly, Monaco, and Pyodide at runtime.
