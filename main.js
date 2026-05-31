@@ -127,7 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const workspaceContainer = document.getElementById('workspace-container');
     const leftSplitter = document.querySelector('.panel-splitter[data-target="left"]');
     const rightSplitter = document.querySelector('.panel-splitter[data-target="right"]');
-    let leftPanelWidth = 220;
+    let leftPanelWidth = 320;
     let rightPanelWidth = 400;
     let activeDrag = null;
 
