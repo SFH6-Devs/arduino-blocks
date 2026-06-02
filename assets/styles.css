@@ -38,6 +38,18 @@ body {
     overflow: hidden;
 }
 
+@media (max-width: 767px) {
+    body {
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    #app {
+        min-height: 100%;
+        height: auto;
+    }
+}
+
 body.is-dragging-panels {
     cursor: col-resize;
     user-select: none;
@@ -705,4 +717,237 @@ aside#right-panel {
     border-radius: 999px;
     border: 2px solid transparent;
     background-clip: content-box;
+}
+
+/* ─── TABLET (768px – 1024px) ─── */
+@media (max-width: 1024px) {
+    #app {
+        padding: 8px;
+        gap: 8px;
+    }
+
+    header#top-bar {
+        height: 60px;
+        padding: 0 12px;
+        gap: 8px;
+    }
+
+    #mission-strip {
+        font-size: 0.85rem;
+        padding: 8px 14px;
+    }
+
+    #controls button {
+        padding: 8px 14px;
+        font-size: 0.85rem;
+    }
+
+    #mode-toggle {
+        gap: 4px;
+        padding: 4px;
+    }
+
+    #mode-toggle button {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+    }
+
+    .category-btn {
+        padding: 10px 12px;
+        font-size: 0.88rem;
+    }
+
+    #category-docs {
+        padding: 10px;
+        gap: 8px;
+    }
+
+    #docs-title {
+        font-size: 0.95rem;
+    }
+
+    #docs-summary {
+        font-size: 0.82rem;
+    }
+}
+
+/* ─── MOBILE (< 768px) ─── */
+@media (max-width: 767px) {
+    #app {
+        padding: 6px;
+        gap: 6px;
+    }
+
+    header#top-bar {
+        height: auto;
+        min-height: 0;
+        grid-template-columns: 1fr auto;
+        grid-template-rows: auto auto;
+        gap: 4px;
+        padding: 6px 10px;
+        border-radius: 14px;
+    }
+
+    #mission-strip {
+        grid-column: 1 / -1;
+        justify-self: stretch;
+        width: 100%;
+        font-size: 0.72rem;
+        padding: 5px 10px;
+    }
+
+    #controls {
+        grid-column: 1;
+        justify-self: start;
+        gap: 6px;
+    }
+
+    #controls button {
+        padding: 5px 10px;
+        font-size: 0.72rem;
+        border-radius: 8px;
+    }
+
+    #mode-toggle {
+        grid-column: 2;
+        gap: 3px;
+        padding: 3px;
+    }
+
+    #mode-toggle button {
+        padding: 5px 8px;
+        font-size: 0.72rem;
+    }
+
+    #workspace-container {
+        flex-direction: column;
+    }
+
+    .panel-splitter {
+        display: none;
+    }
+
+    /* Left sidebar → horizontal category strip */
+    aside#left-sidebar {
+        flex: 0 0 auto;
+        width: 100%;
+        flex-direction: row;
+        padding: 6px 8px;
+        gap: 6px;
+        border-radius: 14px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    #block-categories {
+        flex-direction: row;
+        flex-shrink: 0;
+    }
+
+    .category-btn {
+        white-space: nowrap;
+        padding: 7px 10px;
+        font-size: 0.75rem;
+        width: auto;
+        gap: 6px;
+        border-radius: 999px;
+    }
+
+    .category-btn .category-dot {
+        width: 10px;
+        height: 10px;
+    }
+
+    #category-docs {
+        display: none;
+    }
+
+    /* Centre workspace */
+    section#centre-workspace {
+        flex: 1 1 auto;
+        min-height: 200px;
+        border-radius: 14px;
+    }
+
+    #workspace-watermark {
+        padding: 14px 18px;
+        max-width: 92%;
+    }
+
+    #workspace-watermark h1 {
+        font-size: 1.4rem;
+    }
+
+    #workspace-watermark p {
+        font-size: 0.82rem;
+    }
+
+    /* Right panel → compact footer strip */
+    aside#right-panel {
+        flex: 0 0 auto;
+        width: 100%;
+        min-width: 0;
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding: 6px;
+        gap: 6px;
+        border-radius: 14px;
+    }
+
+    #sim-canvas-container {
+        flex: 1 1 100%;
+        aspect-ratio: 16 / 9;
+        min-height: 100px;
+        max-height: 180px;
+        border-radius: 12px;
+    }
+
+    #sensors-panel {
+        flex: 1 1 100%;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 4px;
+    }
+
+    .sensor {
+        padding: 6px 8px;
+        font-size: 0.65rem;
+        border-radius: 10px;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 2px;
+    }
+
+    #console-panel {
+        flex: 1 1 100%;
+        min-height: 44px;
+        max-height: 80px;
+        font-size: 0.65rem;
+        padding: 6px 8px;
+        border-radius: 12px;
+    }
+
+    #xp-bar-container {
+        flex: 1 1 100%;
+        border-radius: 12px;
+    }
+
+    #xp-bar {
+        height: 22px;
+        border-radius: 12px;
+    }
+
+    #xp-text {
+        font-size: 0.65rem;
+    }
+
+    /* Toast smaller on mobile */
+    #toast-container {
+        bottom: 16px;
+    }
+
+    .toast {
+        padding: 10px 18px;
+        font-size: 0.82rem;
+    }
 }
