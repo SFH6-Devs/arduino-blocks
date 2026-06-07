@@ -107,6 +107,32 @@ header#top-bar {
     color: var(--accent-neon);
 }
 
+#mission-hint {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 0 18px;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.hint-description {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.hint-blocks {
+    font-size: 0.72rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--cat-motion);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 #controls {
     grid-column: 2;
     justify-self: center;

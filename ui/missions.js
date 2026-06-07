@@ -28,6 +28,12 @@ export function cycleMission() {
     renderMissionStrip();
 }
 
+export function nextMission() {
+    if (missions.length === 0) return;
+    activeIndex = (activeIndex + 1) % missions.length;
+    renderMissionStrip();
+}
+
 export function renderMissionStrip() {
     const strip = document.getElementById('mission-strip');
     if (!strip || missions.length === 0) return;
@@ -46,6 +52,27 @@ export function renderMissionStrip() {
     strip.onclick = () => {
         cycleMission();
     };
+
+    renderMissionHint(mission);
+}
+
+function renderMissionHint(mission) {
+    const hintEl = document.getElementById('mission-hint');
+    if (!hintEl) return;
+
+    hintEl.textContent = '';
+
+    const desc = document.createElement('span');
+    desc.className = 'hint-description';
+    desc.textContent = mission.description;
+    hintEl.appendChild(desc);
+
+    if (mission.hints && mission.hints.length > 0) {
+        const blocks = document.createElement('span');
+        blocks.className = 'hint-blocks';
+        blocks.textContent = `Try: ${mission.hints.join(', ')}`;
+        hintEl.appendChild(blocks);
+    }
 }
 
 export function showChallengeComplete(mission, xp) {
@@ -55,6 +82,14 @@ export function showChallengeComplete(mission, xp) {
     document.getElementById('cc-mission-title').textContent = mission.title;
     document.getElementById('cc-xp-amount').textContent = `+${xp} XP`;
     document.getElementById('cc-description').textContent = mission.description;
+
+    const nextBtn = document.getElementById('cc-next');
+    if (nextBtn) {
+        nextBtn.onclick = () => {
+            dialog.close();
+            nextMission();
+        };
+    }
 
     dialog.showModal();
 
@@ -69,5 +104,11 @@ export function showChallengeComplete(mission, xp) {
             origin: { x: originX, y: originY },
             colors: ['#4af09a', '#4d97ff', '#ffca1a']
         });
+    }
+}
+
+export function showMissionFailed(failMsg) {
+    if (window.showToast) {
+        window.showToast(failMsg || 'Mission not passed. Try again!', 'error');
     }
 }

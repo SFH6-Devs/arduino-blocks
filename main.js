@@ -4,7 +4,7 @@ import { initWorkspace } from './editor/workspace.js';
 import { clearConsole } from './ui/console.js';
 import { MissionRunner } from './challenges/runner.js';
 import { loadXP, addXP } from './ui/xp.js';
-import { loadMissions, getActiveMission, showChallengeComplete } from './ui/missions.js';
+import { loadMissions, getActiveMission, showChallengeComplete, showMissionFailed } from './ui/missions.js';
 
 let car;
 let arena;
@@ -109,18 +109,7 @@ const sketch = (p) => {
                     addXP(xp);
                     showChallengeComplete(mission, xp);
                 } else {
-                    window.showToast("Mission Complete!", "success");
-                    if (window.confetti) {
-                        const canvasBounds = document.getElementById('sim-canvas-container').getBoundingClientRect();
-                        const originX = (canvasBounds.left + canvasBounds.width / 2) / window.innerWidth;
-                        const originY = (canvasBounds.top + 50) / window.innerHeight;
-                        window.confetti({
-                            particleCount: 150,
-                            spread: 70,
-                            origin: { x: originX, y: originY },
-                            colors: ['#4af09a', '#4d97ff', '#ffca1a']
-                        });
-                    }
+                    showMissionFailed(mission?.failMsg);
                 }
             }
         }
