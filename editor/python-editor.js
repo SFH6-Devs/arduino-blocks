@@ -36,7 +36,8 @@ export async function initPythonEditor() {
     return state.ready;
 }
 
-export function syncPythonFromWorkspace(source) {
+export function syncPythonFromWorkspace(source, options = {}) {
+    const { force = false } = options;
     state.workspaceSource = source || '';
 
     if (!state.editor) {
@@ -44,7 +45,7 @@ export function syncPythonFromWorkspace(source) {
         return;
     }
 
-    if (!state.dirty && state.editor.getValue() !== state.workspaceSource) {
+    if (force || (!state.dirty && state.editor.getValue() !== state.workspaceSource)) {
         state.applyingWorkspace = true;
         state.editor.setValue(state.workspaceSource);
         state.applyingWorkspace = false;
@@ -56,6 +57,10 @@ export function syncPythonFromWorkspace(source) {
 
 export function getPythonSource() {
     return state.editor ? state.editor.getValue() : state.workspaceSource;
+}
+
+export function isPythonEditorDirty() {
+    return state.dirty;
 }
 
 export function layoutPythonEditor() {

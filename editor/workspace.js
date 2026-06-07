@@ -354,8 +354,39 @@ export function initWorkspace() {
     const setMode = async (mode) => {
         const previousMode = window.runMode;
 
+        // Blocks → Python (after Python edits): offer choice
+        if (previousMode === 'blocks' && mode === 'python' && isPythonEditorDirty()) {
+            const { atEntry, userEdits } = stateManager.getPythonState();
+
+            if (userEdits && userEdits !== atEntry) {
+                const choice = await showModeDialog(
+                    'Which Python code would you like to use?',
+                    'You have both new blocks and previous edits.',
+                    {
+                        primary: { label: 'Use regenerated Python' },
+                        secondary: { label: 'Use your previous edits' }
+                    }
+                );
+
+                if (choice === 'cancel') return;
+
+                window.runMode = mode;
+
+                if (choice === 'secondary') {
+                    syncPythonFromWorkspace(userEdits, { force: true });
+                } else {
+                    const pythonCode = Blockly.Python.workspaceToCode(workspace);
+                    stateManager.savePythonState(pythonCode, pythonCode);
+                }
+            } else {
+                window.runMode = mode;
+                stateManager.saveBlocksXml(workspace);
+                const pythonCode = Blockly.Python.workspaceToCode(workspace);
+                stateManager.savePythonState(pythonCode, pythonCode);
+            }
+        }
         // Blocks → Python: save state
-        if (previousMode === 'blocks' && mode === 'python') {
+        else if (previousMode === 'blocks' && mode === 'python') {
             stateManager.saveBlocksXml(workspace);
             const pythonCode = Blockly.Python.workspaceToCode(workspace);
             stateManager.savePythonState(pythonCode, pythonCode);
@@ -386,37 +417,6 @@ export function initWorkspace() {
                 }
             } else {
                 window.runMode = mode;
-            }
-        }
-        // Blocks → Python (after Python edits): offer choice
-        else if (previousMode === 'blocks' && mode === 'python' && isPythonEditorDirty()) {
-            const { atEntry, userEdits } = stateManager.getPythonState();
-
-            if (userEdits && userEdits !== atEntry) {
-                const choice = await showModeDialog(
-                    'Which Python code would you like to use?',
-                    'You have both new blocks and previous edits.',
-                    {
-                        primary: { label: 'Use regenerated Python' },
-                        secondary: { label: 'Use your previous edits' }
-                    }
-                );
-
-                if (choice === 'cancel') return;
-
-                window.runMode = mode;
-
-                if (choice === 'secondary') {
-                    syncPythonFromWorkspace(userEdits, { force: true });
-                } else {
-                    const pythonCode = Blockly.Python.workspaceToCode(workspace);
-                    stateManager.savePythonState(pythonCode, pythonCode);
-                }
-            } else {
-                window.runMode = mode;
-                stateManager.saveBlocksXml(workspace);
-                const pythonCode = Blockly.Python.workspaceToCode(workspace);
-                stateManager.savePythonState(pythonCode, pythonCode);
             }
         }
         // Default: just switch
@@ -548,6 +548,7 @@ export function initWorkspace() {
             workspace.clear();
             document.getElementById('settings-dialog').close();
             if (window.showToast) window.showToast('All saved state cleared', 'success');
+            setTimeout(() => location.reload(), 500);
         }
     });
 

@@ -62,7 +62,8 @@ export async function initCppEditor() {
     return state.ready;
 }
 
-export function syncCppFromWorkspace(body) {
+export function syncCppFromWorkspace(body, options = {}) {
+    const { force = false } = options;
     state.workspaceSource = buildCppSketch(body || '');
 
     if (!state.editor) {
@@ -70,7 +71,7 @@ export function syncCppFromWorkspace(body) {
         return;
     }
 
-    if (!state.dirty && state.editor.getValue() !== state.workspaceSource) {
+    if (force || (!state.dirty && state.editor.getValue() !== state.workspaceSource)) {
         state.applyingWorkspace = true;
         state.editor.setValue(state.workspaceSource);
         state.applyingWorkspace = false;

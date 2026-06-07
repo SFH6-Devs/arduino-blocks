@@ -50,6 +50,7 @@
                 <button id="run-btn">▶ Run</button>
                 <button id="reset-btn">↺ Reset</button>
                 <button id="connect-btn">Connect Car</button>
+                <button id="settings-btn" title="Settings">⚙ Settings</button>
             </div>
             <div id="mode-toggle">
                 <button class="active" data-mode="blocks">Blocks</button>
@@ -137,6 +138,33 @@
 
     <!-- Toast UI -->
     <div id="toast-container"></div>
+
+    <!-- Mode Switch Dialog -->
+    <dialog id="mode-switch-dialog">
+        <div class="dialog-content">
+            <h2 id="dialog-title">Choose an option</h2>
+            <p id="dialog-message">What would you like to do?</p>
+            <div class="dialog-actions">
+                <button id="dialog-primary">Option 1</button>
+                <button id="dialog-secondary" class="secondary">Option 2</button>
+                <button id="dialog-cancel" class="cancel">Cancel</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- Settings Dialog -->
+    <dialog id="settings-dialog">
+        <div class="dialog-content">
+            <h2>Settings</h2>
+            <div class="settings-group">
+                <button id="clear-state-btn" class="danger">Clear All Saved State</button>
+                <p class="help-text">This will reset all blocks, Python code, and saved workspace state.</p>
+            </div>
+            <div class="dialog-actions">
+                <button id="settings-close" class="secondary">Close</button>
+            </div>
+        </div>
+    </dialog>
 
     <!-- Main Module -->
     <script type="module" src="main.js"></script>
