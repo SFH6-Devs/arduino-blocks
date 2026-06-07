@@ -15,6 +15,7 @@ import {
     syncPythonFromWorkspace
 } from './python-editor.js';
 import { appendConsoleLine, clearConsole, writeConsoleError } from '../ui/console.js';
+import { isBlockUnlocked, getLevel } from '../ui/levels.js';
 
 // ============================================================================
 // State Management
@@ -554,6 +555,21 @@ export function initWorkspace() {
 
     void initPythonEditor().catch((error) => console.error(error));
     void initCppEditor().catch((error) => console.error(error));
+
+    const applyBlockLocking = () => {
+        const level = getLevel();
+        const allBlocks = workspace.getAllBlocks(false);
+        allBlocks.forEach((block) => {
+            const unlocked = isBlockUnlocked(block.type, level);
+            block.setEnabled(unlocked);
+            if (!unlocked) {
+                block.setTooltip(`Unlocks at level ${block.type === 'distance' || block.type === 'if_obstacle' ? 4 : 5}`);
+            }
+        });
+    };
+
+    applyBlockLocking();
+    workspace.addChangeListener(() => applyBlockLocking());
 
     syncCodeFromWorkspace();
     renderDocs('motion');

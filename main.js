@@ -2,12 +2,18 @@ import { Car } from './sim/car.js';
 import { Arena } from './sim/arena.js';
 import { initWorkspace } from './editor/workspace.js';
 import { clearConsole } from './ui/console.js';
+import { MissionRunner } from './challenges/runner.js';
+import { loadXP, addXP } from './ui/xp.js';
+import { loadMissions, getActiveMission, showChallengeComplete } from './ui/missions.js';
 
 let car;
 let arena;
 let simLayer;
 let finishReported = false;
 let resizeObserver;
+let runner = new MissionRunner();
+let prevCrashed = false;
+let turnInProgress = false;
 
 const syncSimCanvas = () => {
     const simP5 = window.simP5;
@@ -79,24 +85,42 @@ const sketch = (p) => {
         if (car) {
             car.update(arena);
             car.draw(simLayer);
+
+            if (car.crashed && !prevCrashed) {
+                runner.onCollision();
+            }
+            prevCrashed = car.crashed;
+
+            const isTurning = car.action && car.action.type && car.action.type.startsWith('turn');
+            if (isTurning && !turnInProgress) {
+                runner.onTurn();
+            }
+            turnInProgress = isTurning;
             
             if (arena.checkFinish(car.x, car.y) && !finishReported && !car.crashed) {
                 finishReported = true;
                 car.stop();
-                window.showToast("Mission Complete! +10 XP", "success");
-                
-                // Fire confetti!
-                if (window.confetti) {
-                    const canvasBounds = document.getElementById('sim-canvas-container').getBoundingClientRect();
-                    const originX = (canvasBounds.left + canvasBounds.width / 2) / window.innerWidth;
-                    const originY = (canvasBounds.top + 50) / window.innerHeight; // top of canvas
-                    
-                    window.confetti({
-                        particleCount: 150,
-                        spread: 70,
-                        origin: { x: originX, y: originY },
-                        colors: ['#4af09a', '#4d97ff', '#ffca1a']
-                    });
+                runner.onFinish();
+
+                const mission = getActiveMission();
+                if (mission && runner.checkPass(mission)) {
+                    const mode = window.runMode || 'blocks';
+                    const xp = runner.getXPReward(mission, mode);
+                    addXP(xp);
+                    showChallengeComplete(mission, xp);
+                } else {
+                    window.showToast("Mission Complete!", "success");
+                    if (window.confetti) {
+                        const canvasBounds = document.getElementById('sim-canvas-container').getBoundingClientRect();
+                        const originX = (canvasBounds.left + canvasBounds.width / 2) / window.innerWidth;
+                        const originY = (canvasBounds.top + 50) / window.innerHeight;
+                        window.confetti({
+                            particleCount: 150,
+                            spread: 70,
+                            origin: { x: originX, y: originY },
+                            colors: ['#4af09a', '#4d97ff', '#ffca1a']
+                        });
+                    }
                 }
             }
         }
@@ -118,11 +142,20 @@ document.getElementById('reset-btn').addEventListener('click', () => {
         clearConsole();
         car.reset(arena.width / 2, arena.height - 60);
         finishReported = false;
+        runner.reset();
+        prevCrashed = false;
+        turnInProgress = false;
     }
 });
 
 document.addEventListener("DOMContentLoaded", () => {
+    loadXP();
+    loadMissions();
     initWorkspace();
+
+    document.getElementById('cc-close')?.addEventListener('click', () => {
+        document.getElementById('challenge-complete-dialog').close();
+    });
 
     const workspaceContainer = document.getElementById('workspace-container');
     const leftSplitter = document.querySelector('.panel-splitter[data-target="left"]');

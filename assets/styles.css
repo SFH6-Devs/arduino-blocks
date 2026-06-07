@@ -725,7 +725,8 @@ aside#right-panel {
    ============================================================================ */
 
 #mode-switch-dialog,
-#settings-dialog {
+#settings-dialog,
+#challenge-complete-dialog {
     margin:auto;
     border: none;
     border-radius: var(--panel-r);
@@ -738,7 +739,8 @@ aside#right-panel {
 }
 
 #mode-switch-dialog::backdrop,
-#settings-dialog::backdrop {
+#settings-dialog::backdrop,
+#challenge-complete-dialog::backdrop {
     backdrop-filter: blur(1px);
 }
 
@@ -855,6 +857,51 @@ aside#right-panel {
 #settings-btn:hover {
     transform: translateY(-1px);
     border-color: rgba(74, 240, 154, 0.35);
+}
+
+/* Challenge Complete Dialog */
+.cc-dialog {
+    align-items: center;
+    text-align: center;
+}
+
+.cc-badge {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--accent-neon);
+    color: #08130d;
+    font-size: 1.5rem;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+}
+
+.cc-xp {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--cat-loops);
+    margin: 8px 0 16px;
+}
+
+#challenge-complete-dialog .primary {
+    background: var(--accent-neon);
+    color: #08130d;
+    font-weight: 900;
+    border: 1px solid rgba(74, 240, 154, 0.9);
+    border-radius: 12px;
+    padding: 12px 32px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.14s ease;
+}
+
+#challenge-complete-dialog .primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(74, 240, 154, 0.2);
 }
 
 /* ─── TABLET (768px – 1024px) ─── */

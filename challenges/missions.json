@@ -1,0 +1,26 @@
+[
+    {
+        "id": "m1",
+        "title": "Drive Forward",
+        "arena": "open",
+        "description": "Reach the finish line.",
+        "pass": "reach_finish",
+        "xp": { "blocks": 10, "python": 20, "cpp": 30 }
+    },
+    {
+        "id": "m2",
+        "title": "Clean Run",
+        "arena": "open",
+        "description": "Reach the finish with 0 collisions.",
+        "pass": "finish_no_collisions",
+        "xp": { "blocks": 15, "python": 25, "cpp": 35 }
+    },
+    {
+        "id": "m3",
+        "title": "Turn the Corner",
+        "arena": "open",
+        "description": "Reach the finish after at least 1 turn.",
+        "pass": "finish_with_turn",
+        "xp": { "blocks": 15, "python": 25, "cpp": 35 }
+    }
+]
