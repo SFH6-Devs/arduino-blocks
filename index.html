@@ -1,37 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ArduinoSim</title>
-    
+
     <!-- Fonts and CSS -->
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=JetBrains+Mono:wght@400;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="assets/styles.css">
-    
+
     <!-- External Libraries (CDNs) -->
     <!-- p5.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
-    
+
     <!-- Blockly -->
     <script src="https://unpkg.com/blockly/blockly_compressed.js"></script>
     <script src="https://unpkg.com/blockly/blocks_compressed.js"></script>
     <script src="https://unpkg.com/blockly/javascript_compressed.js"></script>
     <script src="https://unpkg.com/blockly/python_compressed.js"></script>
     <script src="https://unpkg.com/blockly/msg/en.js"></script>
-    
+
     <!-- Pyodide -->
     <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
-    
+
     <!-- Confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
-    
+
     <!-- Monaco Editor Loader -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
-    
+
     <script>
         // Setup Monaco environment
-        require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' }});
+        require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' } });
         window.MonacoEnvironment = { getWorkerUrl: () => proxy };
         let proxy = URL.createObjectURL(new Blob([`
             self.MonacoEnvironment = {
@@ -41,12 +44,15 @@
         `], { type: 'text/javascript' }));
     </script>
 </head>
+
 <body>
     <div id="app">
         <!-- Top Navigation / Mission Strip -->
         <header id="top-bar">
-            <div id="mission-strip">Mission 1: Drive Forward</div>
-            <div id="mission-hint"></div>
+            <div id="mission-strip">Mission 1: Drive Forward
+                <div id="mission-hint"></div>
+            </div>
+
             <div id="controls">
                 <button id="run-btn">▶ Run</button>
                 <button id="reset-btn">↺ Reset</button>
@@ -101,8 +107,10 @@
             <section id="centre-workspace">
                 <div id="workspace-watermark">
                     <h1>Code Your First Robot</h1>
-                    <p>Drag a <span style="color: var(--cat-motion); font-weight: 900;">move forward</span> block here.</p>
-                    <p>Press <span style="color: var(--accent-neon); font-weight: 900;">▶ Run</span> to reach the finish line.</p>
+                    <p>Drag a <span style="color: var(--cat-motion); font-weight: 900;">move forward</span> block here.
+                    </p>
+                    <p>Press <span style="color: var(--accent-neon); font-weight: 900;">▶ Run</span> to reach the finish
+                        line.</p>
                 </div>
                 <div id="blockly-div"></div>
                 <div id="monaco-editor">
@@ -184,4 +192,5 @@
     <!-- Main Module -->
     <script type="module" src="main.js"></script>
 </body>
+
 </html>

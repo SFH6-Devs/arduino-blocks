@@ -57,8 +57,13 @@ export function renderMissionStrip() {
 }
 
 function renderMissionHint(mission) {
-    const hintEl = document.getElementById('mission-hint');
-    if (!hintEl) return;
+    let hintEl = document.getElementById('mission-hint');
+    if (!hintEl) {
+        hintEl = document.createElement('div');
+        hintEl.id = 'mission-hint';
+        const strip = document.getElementById('mission-strip');
+        if (strip) strip.appendChild(hintEl);
+    }
 
     hintEl.textContent = '';
 
