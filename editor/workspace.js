@@ -9,11 +9,126 @@ import {
 import {
     getPythonSource,
     initPythonEditor,
+    isPythonEditorDirty,
     layoutPythonEditor,
     runPythonEditor,
     syncPythonFromWorkspace
 } from './python-editor.js';
 import { appendConsoleLine, clearConsole, writeConsoleError } from '../ui/console.js';
+
+// ============================================================================
+// State Management
+// ============================================================================
+
+const STATE_KEY = 'arduinosim_state';
+
+const stateManager = {
+    get() {
+        try {
+            return JSON.parse(localStorage.getItem(STATE_KEY)) || {};
+        } catch {
+            return {};
+        }
+    },
+
+    set(updates) {
+        const current = this.get();
+        const updated = { ...current, ...updates };
+        localStorage.setItem(STATE_KEY, JSON.stringify(updated));
+    },
+
+    clear() {
+        localStorage.removeItem(STATE_KEY);
+    },
+
+    saveBlocksXml(workspace) {
+        const xml = Blockly.Xml.workspaceToDom(workspace);
+        const xmlStr = Blockly.Xml.domToText(xml);
+        this.set({ blocksXml: xmlStr });
+    },
+
+    loadBlocksXml(workspace) {
+        const state = this.get();
+        if (!state.blocksXml) return false;
+
+        try {
+            const xml = Blockly.Xml.textToDom(state.blocksXml);
+            Blockly.Xml.domToWorkspace(xml, workspace);
+            return true;
+        } catch (e) {
+            console.error('Failed to restore blocks:', e);
+            return false;
+        }
+    },
+
+    savePythonState(atEntry, userEdits) {
+        this.set({
+            pythonAtEntry: atEntry || '',
+            pythonUserEdits: userEdits || ''
+        });
+    },
+
+    getPythonState() {
+        const state = this.get();
+        return {
+            atEntry: state.pythonAtEntry || '',
+            userEdits: state.pythonUserEdits || ''
+        };
+    }
+};
+
+// ============================================================================
+// Dialog Helpers
+// ============================================================================
+
+const showModeDialog = (title, message, actions) => {
+    return new Promise((resolve) => {
+        const dialog = document.getElementById('mode-switch-dialog');
+        const titleEl = document.getElementById('dialog-title');
+        const messageEl = document.getElementById('dialog-message');
+        const primaryBtn = document.getElementById('dialog-primary');
+        const secondaryBtn = document.getElementById('dialog-secondary');
+        const cancelBtn = document.getElementById('dialog-cancel');
+
+        titleEl.textContent = title;
+        messageEl.textContent = message;
+
+        primaryBtn.textContent = actions.primary.label;
+        secondaryBtn.textContent = actions.secondary.label;
+
+        const cleanup = () => {
+            primaryBtn.removeEventListener('click', onPrimary);
+            secondaryBtn.removeEventListener('click', onSecondary);
+            cancelBtn.removeEventListener('click', onCancel);
+            dialog.close();
+        };
+
+        const onPrimary = () => {
+            cleanup();
+            resolve('primary');
+        };
+
+        const onSecondary = () => {
+            cleanup();
+            resolve('secondary');
+        };
+
+        const onCancel = () => {
+            cleanup();
+            resolve('cancel');
+        };
+
+        primaryBtn.addEventListener('click', onPrimary);
+        secondaryBtn.addEventListener('click', onSecondary);
+        cancelBtn.addEventListener('click', onCancel);
+
+        dialog.showModal();
+    });
+};
+
+// ============================================================================
+// Main Workspace Initialization
+// ============================================================================
 
 export function initWorkspace() {
     defineBlocks();
@@ -236,8 +351,78 @@ export function initWorkspace() {
         window.generatedCpp = getCppSource();
     };
 
-    const setMode = (mode) => {
-        window.runMode = mode;
+    const setMode = async (mode) => {
+        const previousMode = window.runMode;
+
+        // Blocks → Python: save state
+        if (previousMode === 'blocks' && mode === 'python') {
+            stateManager.saveBlocksXml(workspace);
+            const pythonCode = Blockly.Python.workspaceToCode(workspace);
+            stateManager.savePythonState(pythonCode, pythonCode);
+            window.runMode = mode;
+        }
+        // Python → Blocks: offer restore choice
+        else if (previousMode === 'python' && mode === 'blocks') {
+            const hasSavedBlocks = stateManager.get().blocksXml;
+
+            if (hasSavedBlocks) {
+                const choice = await showModeDialog(
+                    'Restore your blocks?',
+                    'You have saved blocks from before entering Python mode.',
+                    {
+                        primary: { label: 'Restore blocks' },
+                        secondary: { label: 'Start fresh' }
+                    }
+                );
+
+                if (choice === 'cancel') return;
+
+                window.runMode = mode;
+
+                if (choice === 'primary') {
+                    stateManager.loadBlocksXml(workspace);
+                } else {
+                    workspace.clear();
+                }
+            } else {
+                window.runMode = mode;
+            }
+        }
+        // Blocks → Python (after Python edits): offer choice
+        else if (previousMode === 'blocks' && mode === 'python' && isPythonEditorDirty()) {
+            const { atEntry, userEdits } = stateManager.getPythonState();
+
+            if (userEdits && userEdits !== atEntry) {
+                const choice = await showModeDialog(
+                    'Which Python code would you like to use?',
+                    'You have both new blocks and previous edits.',
+                    {
+                        primary: { label: 'Use regenerated Python' },
+                        secondary: { label: 'Use your previous edits' }
+                    }
+                );
+
+                if (choice === 'cancel') return;
+
+                window.runMode = mode;
+
+                if (choice === 'secondary') {
+                    syncPythonFromWorkspace(userEdits, { force: true });
+                } else {
+                    const pythonCode = Blockly.Python.workspaceToCode(workspace);
+                    stateManager.savePythonState(pythonCode, pythonCode);
+                }
+            } else {
+                window.runMode = mode;
+                stateManager.saveBlocksXml(workspace);
+                const pythonCode = Blockly.Python.workspaceToCode(workspace);
+                stateManager.savePythonState(pythonCode, pythonCode);
+            }
+        }
+        // Default: just switch
+        else {
+            window.runMode = mode;
+        }
 
         blocklyDiv.classList.toggle('is-hidden', mode !== 'blocks');
         monacoEditor.classList.toggle('is-visible', mode !== 'blocks');
@@ -272,7 +457,7 @@ export function initWorkspace() {
 
     modeButtons.forEach((button) => {
         button.addEventListener('click', () => {
-            setMode(button.dataset.mode);
+            void setMode(button.dataset.mode);
         });
     });
 
@@ -317,7 +502,8 @@ export function initWorkspace() {
                 await runPythonEditor();
             } catch (error) {
                 console.error(error);
-                if (window.showToast) window.showToast('Error running Python code', 'error');
+                writeConsoleError(error);
+                if (window.showToast) window.showToast(error.message || 'Error running Python code', 'error');
             }
 
             return;
@@ -347,10 +533,28 @@ export function initWorkspace() {
         updateWatermark();
     });
 
+    // Settings dialog
+    document.getElementById('settings-btn').addEventListener('click', () => {
+        document.getElementById('settings-dialog').showModal();
+    });
+
+    document.getElementById('settings-close').addEventListener('click', () => {
+        document.getElementById('settings-dialog').close();
+    });
+
+    document.getElementById('clear-state-btn').addEventListener('click', () => {
+        if (confirm('Are you sure you want to clear all saved state? This cannot be undone.')) {
+            stateManager.clear();
+            workspace.clear();
+            document.getElementById('settings-dialog').close();
+            if (window.showToast) window.showToast('All saved state cleared', 'success');
+        }
+    });
+
     void initPythonEditor().catch((error) => console.error(error));
     void initCppEditor().catch((error) => console.error(error));
 
     syncCodeFromWorkspace();
     renderDocs('motion');
-    setMode('blocks');
+    void setMode('blocks');
 }

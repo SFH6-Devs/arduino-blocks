@@ -40,6 +40,11 @@ export function writeConsole(message = '') {
 }
 
 export function writeConsoleError(error) {
-    const message = error?.stack || error?.message || String(error || 'Unknown error');
+    if (error?.formatted) {
+        appendConsoleLine(`${error.formatted.label}: ${error.formatted.detail}`);
+        return;
+    }
+
+    const message = error?.message || String(error || 'Unknown error');
     appendConsoleLine(message);
 }

@@ -12,6 +12,18 @@ async def sleep(seconds):
 
 const normaliseOutput = (value) => String(value ?? '').replace(/\r?\n+$/, '');
 
+const PYTHON_ERROR_RE = /File "<exec>", line (\d+)/;
+
+export function formatPythonError(error) {
+    const raw = error?.message || String(error);
+    const match = raw.match(PYTHON_ERROR_RE);
+    const line = match ? parseInt(match[1], 10) : null;
+    const label = line !== null ? `Python error (line ${line})` : 'Python error';
+
+    const lastLine = raw.split('\n').findLast((l) => l.trim().length > 0) || raw;
+    return { label, detail: lastLine.trim(), line, raw };
+}
+
 const requireCar = () => {
     if (!window.car) {
         throw new Error('Simulation is not ready yet.');
@@ -68,5 +80,12 @@ export async function ensurePyodideRuntime() {
 
 export async function runPythonProgram(source) {
     const pyodide = await ensurePyodideRuntime();
-    return pyodide.runPythonAsync(source);
+    try {
+        return await pyodide.runPythonAsync(source);
+    } catch (err) {
+        const formatted = formatPythonError(err);
+        const error = new Error(formatted.label);
+        error.formatted = formatted;
+        throw error;
+    }
 }
