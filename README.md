@@ -10,7 +10,7 @@ A progressive, browser-based simulator and coding environment for the Elegoo Sma
 
 ## Current Project Status
 
-**Current Stage: Phase 4 (Missions + XP) — NEXT**
+**Current Stage: Phase 5 (Arena Types + Sensors) — NEXT**
 
 What exists today:
 
@@ -18,7 +18,7 @@ What exists today:
 *   [x] **Phase 1:** Core Simulation (basic open arena, car movement, p5.js integration)
 *   [x] **Phase 2:** Block Coding Layer (Blockly blocks + JS codegen + run button)
 *   [x] **Phase 3:** Python + C++ Editors (Monaco, Pyodide bridge)
-*   [ ] **Phase 4:** Missions + XP (progression system, unlock gates)
+*   [x] **Phase 4:** Missions + XP (progression system, unlock gates)
 *   [ ] **Phase 5:** Arena Types + Sensors (line/obstacle tracks, virtual ultrasonic/IR)
 *   [ ] **Phase 6:** Serial Bridge (Web Serial API, Elegoo physical integration)
 
