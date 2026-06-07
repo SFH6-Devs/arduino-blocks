@@ -15,7 +15,8 @@ import {
     syncPythonFromWorkspace
 } from './python-editor.js';
 import { appendConsoleLine, clearConsole, writeConsoleError } from '../ui/console.js';
-import { isBlockUnlocked, getLevel } from '../ui/levels.js';
+import { isBlockUnlocked } from '../ui/levels.js';
+import { getLevel } from '../ui/xp.js';
 
 // ============================================================================
 // State Management
