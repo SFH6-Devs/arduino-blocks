@@ -242,22 +242,6 @@
             margin: 40px 0;
         }
 
-        /* Back to App Link */
-        #back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--accent-neon);
-            font-weight: 900;
-            margin-bottom: 24px;
-            text-decoration: none;
-            transition: transform 0.2s ease;
-        }
-
-        #back-link:hover {
-            transform: translateX(-4px);
-        }
-
         /* Loading state */
         #content {
             min-height: 200px;
@@ -321,7 +305,6 @@
 </head>
 <body>
     <div id="container">
-        <a id="back-link" href="javascript:history.back()">← Back</a>
         <div id="content" class="loading"></div>
     </div>
 
