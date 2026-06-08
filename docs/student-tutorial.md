@@ -39,3 +39,109 @@ XP, missions, and unlocks are part of the planned progression system. They are n
 Once you master blocks, you can switch the coding mode at the top of the screen to Python. When you do this, you will see exactly how your block program looks in Python code. You can even type Python directly. 
 
 Eventually, you will unlock C++ mode. This is the exact language that physical Arduino robots understand. In the planned final version, you will be able to connect a real Elegoo Robot Car using a USB cable and run the same instructions on the physical robot.
+
+---
+
+## Python Reference Guide
+
+When you switch to **Python mode**, you can write code directly to control the car. Here are all the commands you can use:
+
+### Movement Commands
+
+**Move Forward**
+```python
+car.forward(1000)
+```
+Drives the car forward for the specified time in milliseconds. `1000` = 1 second.
+
+**Move Backward**
+```python
+car.back(500)
+```
+Drives the car backward for the specified time in milliseconds.
+
+**Turn Left**
+```python
+car.turn_left(90)
+```
+Rotates the car counter-clockwise by the specified degrees. `90` = quarter turn, `180` = half turn, `360` = full circle.
+
+**Turn Right**
+```python
+car.turn_right(90)
+```
+Rotates the car clockwise by the specified degrees.
+
+**Stop**
+```python
+car.stop()
+```
+Immediately stops all movement. The car will not move until you give it another command.
+
+### Speed Control
+
+**Set Speed**
+```python
+car.set_speed(5)
+```
+Sets the car's speed from `1` (slowest) to `10` (fastest). Default speed is `5`.
+
+### Sensor Commands
+
+**Read Distance Sensor**
+```python
+distance = car.distance()
+print(distance)
+```
+Returns the distance in centimeters detected by the ultrasonic sensor. Useful for obstacle avoidance.
+
+**Read Line Sensor**
+```python
+if car.on_line():
+    print("Car is on the line!")
+```
+Returns `True` if the IR sensor detects a line, `False` otherwise. Useful for line-following challenges.
+
+### Example Programs
+
+**Simple Forward and Stop**
+```python
+car.forward(2000)
+car.stop()
+```
+
+**Drive Forward, Turn, and Return**
+```python
+car.forward(1500)
+car.turn_right(90)
+car.forward(1500)
+car.turn_left(90)
+car.forward(1500)
+```
+
+**Slow Speed Test**
+```python
+car.set_speed(2)
+car.forward(3000)
+car.stop()
+```
+
+**Simple Obstacle Avoidance**
+```python
+while car.distance() > 20:
+    car.forward(500)
+
+car.stop()
+car.turn_left(90)
+car.forward(1000)
+car.turn_right(90)
+car.forward(2000)
+```
+
+### Tips for Python Coding
+
+- **Use `await`** — All car commands take time to complete. In Python mode, code runs sequentially, so one command waits for the previous one to finish before starting.
+- **Combine commands** — Write multiple commands one after another to create more complex programs.
+- **Test incrementally** — Start with a simple command, click Run, and watch the simulator. Then add more commands and test again.
+- **Use loops** — Python's `while` and `for` loops let you repeat actions without duplicating code.
+- **Read sensors first** — Always check `car.distance()` or `car.on_line()` before making decisions in your program.
