@@ -39,7 +39,7 @@ body {
     overflow: hidden;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 1024px) {
     body {
         overflow: auto;
         -webkit-overflow-scrolling: touch;
@@ -985,8 +985,8 @@ aside#right-panel {
     }
 }
 
-/* ─── MOBILE (< 768px) ─── */
-@media (max-width: 767px) {
+/* ─── RESPONSIVE LAYOUT (< 1024px) ─── */
+@media (max-width: 1024px) {
     #app {
         padding: 6px;
         gap: 6px;
