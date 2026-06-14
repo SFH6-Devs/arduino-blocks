@@ -22,11 +22,41 @@
     {
         "id": "m3",
         "title": "Turn the Corner",
-        "arena": "open",
+        "arena": "turn_obstacle",
         "description": "Reach the finish after at least 1 turn.",
         "pass": "finish_with_turn",
         "hints": ["turn left", "turn right", "move forward"],
         "failMsg": "You need to make at least one turn! Try adding a turn left or turn right block.",
         "xp": { "blocks": 15, "python": 25, "cpp": 35 }
+    },
+    {
+        "id": "m4",
+        "title": "Obstacle Course",
+        "arena": "obstacle",
+        "description": "Reach the finish with 0 collisions.",
+        "pass": "finish_no_collisions",
+        "hints": ["if obstacle", "distance"],
+        "failMsg": "You hit an obstacle! Try using the distance sensor to stop or turn before crashing.",
+        "xp": { "blocks": 20, "python": 30, "cpp": 40 }
+    },
+    {
+        "id": "m5",
+        "title": "Follow the Line",
+        "arena": "line",
+        "description": "Stay on the line for 5s continuously.",
+        "pass": "on_line_5s",
+        "hints": ["on line?", "if on line", "repeat"],
+        "failMsg": "You lost the line! Write a loop that steers you back onto the track.",
+        "xp": { "blocks": 25, "python": 35, "cpp": 50 }
+    },
+    {
+        "id": "m6",
+        "title": "Full Course",
+        "arena": "line",
+        "description": "Finish the line track and stay on the line for 5s.",
+        "pass": "finish_and_on_line",
+        "hints": ["repeat", "on line?", "distance"],
+        "failMsg": "Try combining obstacle avoidance and line following logic!",
+        "xp": { "blocks": 40, "python": 60, "cpp": 80 }
     }
 ]

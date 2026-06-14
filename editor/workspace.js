@@ -17,6 +17,8 @@ import {
 import { appendConsoleLine, clearConsole, writeConsoleError } from '../ui/console.js';
 import { isBlockUnlocked } from '../ui/levels.js';
 import { getLevel } from '../ui/xp.js';
+import { getActiveMission } from '../ui/missions.js';
+import { MISSION_SOLUTIONS } from './solutions.js';
 
 // ============================================================================
 // State Management
@@ -54,7 +56,7 @@ const stateManager = {
         if (!state.blocksXml) return false;
 
         try {
-            const xml = Blockly.Xml.textToDom(state.blocksXml);
+            const xml = Blockly.utils.xml.textToDom(state.blocksXml);
             Blockly.Xml.domToWorkspace(xml, workspace);
             return true;
         } catch (e) {
@@ -136,6 +138,19 @@ export function initWorkspace() {
     defineBlocks();
     initGenerators();
 
+    // Patch standard Blockly blocks to match our custom styles
+    const originalCompareInit = Blockly.Blocks['logic_compare'].init;
+    Blockly.Blocks['logic_compare'].init = function() {
+        originalCompareInit.call(this);
+        this.setStyle('sensing_blocks');
+    };
+
+    const originalNumberInit = Blockly.Blocks['math_number'].init;
+    Blockly.Blocks['math_number'].init = function() {
+        originalNumberInit.call(this);
+        this.setStyle('sensing_blocks');
+    };
+
     const toolboxes = {
         motion: {
             kind: 'flyoutToolbox',
@@ -145,6 +160,7 @@ export function initWorkspace() {
                 { kind: 'block', type: 'turn_left' },
                 { kind: 'block', type: 'turn_right' },
                 { kind: 'block', type: 'set_speed' },
+                { kind: 'block', type: 'set_motors' },
                 { kind: 'block', type: 'stop_car' }
             ]
         },
@@ -152,6 +168,8 @@ export function initWorkspace() {
             kind: 'flyoutToolbox',
             contents: [
                 { kind: 'block', type: 'wait' },
+                { kind: 'block', type: 'controls_if' },
+                { kind: 'block', type: 'if_else' },
                 { kind: 'block', type: 'if_obstacle' },
                 { kind: 'block', type: 'if_on_line' }
             ]
@@ -160,7 +178,10 @@ export function initWorkspace() {
             kind: 'flyoutToolbox',
             contents: [
                 { kind: 'block', type: 'distance' },
-                { kind: 'block', type: 'on_line' }
+                { kind: 'block', type: 'on_line_left' },
+                { kind: 'block', type: 'on_line_right' },
+                { kind: 'block', type: 'logic_compare' },
+                { kind: 'block', type: 'math_number' }
             ]
         },
         loops: {
@@ -295,7 +316,17 @@ export function initWorkspace() {
                     colourSecondary: '#d4850a',
                     colourTertiary: '#a06000'
                 },
+                logic_blocks: {
+                    colourPrimary: '#ffab19',
+                    colourSecondary: '#d4850a',
+                    colourTertiary: '#a06000'
+                },
                 sensing_blocks: {
+                    colourPrimary: '#5cb1d6',
+                    colourSecondary: '#3a8aad',
+                    colourTertiary: '#1e6080'
+                },
+                math_blocks: {
                     colourPrimary: '#5cb1d6',
                     colourSecondary: '#3a8aad',
                     colourTertiary: '#1e6080'
@@ -470,6 +501,9 @@ export function initWorkspace() {
 
     document.getElementById('run-btn').addEventListener('click', async () => {
         clearConsole();
+        
+        // Reset car and runner state
+        document.getElementById('reset-btn').click();
 
         if (window.runMode === 'blocks') {
             const code = Blockly.JavaScript.workspaceToCode(workspace);
@@ -544,6 +578,27 @@ export function initWorkspace() {
         document.getElementById('settings-dialog').close();
     });
 
+    document.getElementById('solution-btn').addEventListener('click', () => {
+        if (window.runMode !== 'blocks') {
+            if (window.showToast) window.showToast('Solutions are only available in Blocks mode.', 'error');
+            return;
+        }
+        const mission = getActiveMission();
+        if (!mission) return;
+        
+        const xmlStr = MISSION_SOLUTIONS[mission.id];
+        if (xmlStr) {
+            if (confirm('Load the model solution? This will replace your current blocks.')) {
+                workspace.clear();
+                const xml = Blockly.utils.xml.textToDom(xmlStr);
+                Blockly.Xml.domToWorkspace(xml, workspace);
+                if (window.showToast) window.showToast('Model solution loaded!', 'success');
+            }
+        } else {
+            if (window.showToast) window.showToast('No solution available for this mission.', 'error');
+        }
+    });
+
     document.getElementById('clear-state-btn').addEventListener('click', () => {
         if (confirm('Are you sure you want to clear all saved state? This cannot be undone.')) {
             stateManager.clear();
@@ -562,7 +617,11 @@ export function initWorkspace() {
         const allBlocks = workspace.getAllBlocks(false);
         allBlocks.forEach((block) => {
             const unlocked = isBlockUnlocked(block.type, level);
-            block.setEnabled(unlocked);
+            if (typeof block.setEnabled === 'function') {
+                block.setEnabled(unlocked);
+            } else if (typeof block.setDisabled === 'function') {
+                block.setDisabled(!unlocked);
+            }
             if (!unlocked) {
                 block.setTooltip(`Unlocks at level ${block.type === 'distance' || block.type === 'if_obstacle' ? 4 : 5}`);
             }
