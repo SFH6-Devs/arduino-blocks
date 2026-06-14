@@ -36,9 +36,9 @@ Because movement takes time, the internal `Car` methods return Promises. This al
 -   `setSpeed(level)`: Sets global motor speed from 1 to 10.
 -   `stop()`: Immediately halts all motor activity.
 -   `distance()`: Returns the distance in cm from the ultrasonic sensor.
--   `onLine()`: Returns a boolean indicating if the IR sensor detects the line.
-
-In the current prototype, `distance()` and `onLine()` are still placeholders.
+-   `onLineLeft()`: Returns a boolean indicating if the left IR sensor detects the line.
+-   `onLineRight()`: Returns a boolean indicating if the right IR sensor detects the line.
+-   `setMotors(left, right)`: Sets left and right motors directly (-255 to 255).
 
 ## Project Structure
 

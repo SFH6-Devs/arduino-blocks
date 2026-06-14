@@ -95,12 +95,25 @@ print(distance)
 ```
 Returns the distance in centimeters detected by the ultrasonic sensor. Useful for obstacle avoidance.
 
-**Read Line Sensor**
+**Read Left Line Sensor**
 ```python
-if car.on_line():
-    print("Car is on the line!")
+if car.on_line_left():
+    print("Left sensor is on the line!")
 ```
-Returns `True` if the IR sensor detects a line, `False` otherwise. Useful for line-following challenges.
+Returns `True` if the left IR sensor detects a line, `False` otherwise. Useful for line-following challenges.
+
+**Read Right Line Sensor**
+```python
+if car.on_line_right():
+    print("Right sensor is on the line!")
+```
+Returns `True` if the right IR sensor detects a line, `False` otherwise. Useful for line-following challenges.
+
+**Set Motors**
+```python
+car.set_motors(200, 200)
+```
+Sets the speed of the left and right motors individually. Values range from `-255` (full reverse) to `255` (full forward). Use `0` to stop the motor.
 
 ### Example Programs
 
