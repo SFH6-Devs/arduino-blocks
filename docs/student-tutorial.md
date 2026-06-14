@@ -140,7 +140,7 @@ car.forward(2000)
 
 ### Tips for Python Coding
 
-- **Use `await`** — All car commands take time to complete. In Python mode, code runs sequentially, so one command waits for the previous one to finish before starting.
+- **Python Syntax** — Remember that Python uses indentation to group code blocks (instead of `{}` like C++).
 - **Combine commands** — Write multiple commands one after another to create more complex programs.
 - **Test incrementally** — Start with a simple command, click Run, and watch the simulator. Then add more commands and test again.
 - **Use loops** — Python's `while` and `for` loops let you repeat actions without duplicating code.

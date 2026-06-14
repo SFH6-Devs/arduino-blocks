@@ -40,7 +40,9 @@ const carBridge = {
     set_speed: (speed) => requireCar().setSpeed(speed),
     stop: () => requireCar().stop(),
     distance: () => requireCar().distance(),
-    on_line: () => requireCar().onLine()
+    on_line_left: () => requireCar().onLineLeft(),
+    on_line_right: () => requireCar().onLineRight(),
+    set_motors: (l, r) => requireCar().setMotors(l, r)
 };
 
 const installStreamHandlers = (pyodide) => {
@@ -80,8 +82,17 @@ export async function ensurePyodideRuntime() {
 
 export async function runPythonProgram(source) {
     const pyodide = await ensurePyodideRuntime();
+    
+    // Abstract away await
+    const asyncFuncs = ['car.forward', 'car.back', 'car.turn_left', 'car.turn_right', 'car.set_speed', 'car.stop', 'car.set_motors', 'sleep'];
+    let processedSource = source;
+    for (const fn of asyncFuncs) {
+        const regex = new RegExp(`(?<!await\\s+)\\b${fn.replace('.', '\\.')}\\s*\\(`, 'g');
+        processedSource = processedSource.replace(regex, `await ${fn}(`);
+    }
+
     try {
-        return await pyodide.runPythonAsync(source);
+        return await pyodide.runPythonAsync(processedSource);
     } catch (err) {
         const formatted = formatPythonError(err);
         const error = new Error(formatted.label);

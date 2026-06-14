@@ -26,7 +26,7 @@ The rest of this guide describes the intended architecture so the missing pieces
 The public `Car` API is the contract that binds all modes together. Whether a student drags blocks, writes Python, or writes C++, it ultimately maps to these functions.
 
 ### Asynchronous Design
-Because movement takes time, the internal `Car` methods return Promises. This allows execution layers (like Pyodide or a custom JavaScript evaluator) to await completion of an action before proceeding to the next line of code.
+Because movement takes time, the internal `Car` methods return Promises. This allows execution layers to await completion of an action before proceeding to the next line of code. Note that for the Python execution layer, `await` is abstracted away via a source code pre-processor so users don't need to write it explicitly.
 
 ### Methods
 -   `forward(ms)`: Drives both motors forward for the specified milliseconds.
