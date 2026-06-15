@@ -14,7 +14,7 @@
         "title": "Clean Run",
         "arena": "open",
         "description": "Reach the finish with 0 collisions.",
-        "pass": "finish_no_collisions",
+        "pass": "finish_stopped",
         "hints": ["move forward", "set speed"],
         "failMsg": "You crashed! Try slowing down with set speed, or find a clearer path.",
         "xp": { "blocks": 15, "python": 25, "cpp": 35 }

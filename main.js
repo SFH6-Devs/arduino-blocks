@@ -89,7 +89,8 @@ const sketch = (p) => {
         const mission = getActiveMission();
         if (mission && mission.id !== lastMissionId) {
             lastMissionId = mission.id;
-            arena.type = mission.arena;
+            arena = new Arena(simLayer, 800, 500, mission.arena);
+            window.arena = arena;
             resetCar();
             finishReported = false;
             runner.reset();
@@ -121,8 +122,12 @@ const sketch = (p) => {
                 document.getElementById('sensor-motor-r').innerText = `Motor R: ${Math.round(dispR)}%`;
             }
 
-            if (car.crashed && !prevCrashed) {
+            if (car.crashed && !prevCrashed && !finishReported) {
                 runner.onCollision();
+                const mission = getActiveMission();
+                if (mission && mission.pass !== 'reach_finish') {
+                    showMissionFailed(mission?.failMsg || "You crashed!");
+                }
             }
             prevCrashed = car.crashed;
 
@@ -155,18 +160,31 @@ const sketch = (p) => {
             }
             
             if (arena.checkFinish(car.x, car.y) && !finishReported && !car.crashed) {
-                finishReported = true;
-                car.stop();
-                runner.onFinish();
-
                 const mission = getActiveMission();
-                if (mission && runner.checkPass(mission)) {
-                    const mode = window.runMode || 'blocks';
-                    const xp = runner.getXPReward(mission, mode);
-                    addXP(xp);
-                    showChallengeComplete(mission, xp);
+                let shouldWin = false;
+                
+                if (mission && mission.pass === 'finish_stopped') {
+                    const isStopped = !car.action && Math.abs(car.motorL) < 0.1 && Math.abs(car.motorR) < 0.1;
+                    if (isStopped) {
+                        shouldWin = true;
+                    }
                 } else {
-                    showMissionFailed(mission?.failMsg);
+                    shouldWin = true;
+                }
+                
+                if (shouldWin) {
+                    finishReported = true;
+                    car.stop();
+                    runner.onFinish();
+
+                    if (runner.checkPass(mission)) {
+                        const mode = window.runMode || 'blocks';
+                        const xp = runner.getXPReward(mission, mode);
+                        addXP(xp);
+                        showChallengeComplete(mission, xp);
+                    } else {
+                        showMissionFailed(mission?.failMsg);
+                    }
                 }
             }
         }

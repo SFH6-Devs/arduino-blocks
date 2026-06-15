@@ -1,6 +1,6 @@
 export const MISSION_SOLUTIONS = {
     m1: `<xml><block type="move_forward"><field name="TIME">10000</field></block></xml>`,
-    m2: `<xml><block type="move_forward"><field name="TIME">10000</field></block></xml>`,
+    m2: `<xml><block type="move_forward"><field name="TIME">3200</field></block></xml>`,
     m3: `<xml>
             <block type="turn_right"><field name="DEGREES">90</field>
                 <next>

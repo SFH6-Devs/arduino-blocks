@@ -19,7 +19,8 @@ export class Arena {
             this.obstacles = [
                 { x: 200, y: 200, w: 80, h: 80 },
                 { x: 500, y: 150, w: 60, h: 200 },
-                { x: 350, y: 350, w: 100, h: 50 }
+                { x: 350, y: 350, w: 100, h: 50 },
+                { x: 600, y: 150, w: 200, h: 50 } // Block the right path so M3 solution fails
             ];
         }
 

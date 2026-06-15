@@ -37,6 +37,7 @@ export class MissionRunner {
             case 'reach_finish':
                 return true;
             case 'finish_no_collisions':
+            case 'finish_stopped':
                 return this.collisions === 0;
             case 'finish_with_turn':
                 return this.turned;
