@@ -168,7 +168,7 @@ export function initWorkspace() {
             kind: 'flyoutToolbox',
             contents: [
                 { kind: 'block', type: 'wait' },
-                { kind: 'block', type: 'controls_if' },
+                { kind: 'block', type: 'if_simple' },
                 { kind: 'block', type: 'if_else' },
                 { kind: 'block', type: 'if_obstacle' },
                 { kind: 'block', type: 'if_on_line' }

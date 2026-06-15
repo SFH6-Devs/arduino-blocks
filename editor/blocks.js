@@ -79,14 +79,57 @@ export function defineBlocks() {
             "style": "control_blocks"
         },
         {
+            "type": "if_simple",
+            "message0": "if %1 then %2 %3",
+            "args0": [
+                { "type": "input_value", "name": "IF0", "check": "Boolean" },
+                { "type": "input_dummy" },
+                { "type": "input_statement", "name": "DO0" }
+            ],
+            "previousStatement": null,
+            "nextStatement": null,
+            "style": "control_blocks"
+        },
+        {
+            "type": "if_else",
+            "message0": "if %1 then %2 %3 else %4 %5",
+            "args0": [
+                { "type": "input_value", "name": "IF0", "check": "Boolean" },
+                { "type": "input_dummy" },
+                { "type": "input_statement", "name": "DO0" },
+                { "type": "input_dummy" },
+                { "type": "input_statement", "name": "ELSE" }
+            ],
+            "previousStatement": null,
+            "nextStatement": null,
+            "style": "control_blocks"
+        },
+        {
             "type": "distance",
             "message0": "distance",
             "output": "Number",
             "style": "sensing_blocks"
         },
         {
-            "type": "on_line",
-            "message0": "on line?",
+            "type": "set_motors",
+            "message0": "set motors L %1 % R %2 %",
+            "args0": [
+                { "type": "field_number", "name": "SPEED_L", "value": 50, "min": -100, "max": 100 },
+                { "type": "field_number", "name": "SPEED_R", "value": 50, "min": -100, "max": 100 }
+            ],
+            "previousStatement": null,
+            "nextStatement": null,
+            "style": "motion_blocks"
+        },
+        {
+            "type": "on_line_left",
+            "message0": "Left on line?",
+            "output": "Boolean",
+            "style": "sensing_blocks"
+        },
+        {
+            "type": "on_line_right",
+            "message0": "Right on line?",
             "output": "Boolean",
             "style": "sensing_blocks"
         },
