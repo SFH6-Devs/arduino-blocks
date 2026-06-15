@@ -1,3 +1,5 @@
+import { distanceAhead, isOnLineLeft, isOnLineRight } from './sensors.js';
+
 export class Car {
     constructor(x, y) {
         this.reset(x, y);
@@ -14,6 +16,8 @@ export class Car {
         this.crashed = false;
         this.trail = [];
         this.wheelSpin = 0; // for animation
+        this.motorL = 0; // -100 to 100
+        this.motorR = 0; // -100 to 100
     }
 
     forward(time) {
@@ -48,13 +52,21 @@ export class Car {
         this.speedLevel = Math.max(1, Math.min(10, n));
     }
 
-    stop() {
+    setMotors(l, r) {
+        this.motorL = Math.max(-100, Math.min(100, l));
+        this.motorR = Math.max(-100, Math.min(100, r));
+        // Cancel any pending discrete action
         if (this.action && this.action.resolve) this.action.resolve();
         this.action = null;
     }
+
+    stop() {
+        this.setMotors(0, 0);
+    }
     
-    distance() { return 100; }
-    onLine() { return false; }
+    distance() { return window.arena ? distanceAhead(this, window.arena) : 100; }
+    onLineLeft() { return window.arena ? isOnLineLeft(this, window.arena) : false; }
+    onLineRight() { return window.arena ? isOnLineRight(this, window.arena) : false; }
     
     update(arena) {
         if (this.crashed) return; // Don't move if crashed
@@ -65,48 +77,72 @@ export class Car {
             if (this.trail.length > 30) this.trail.shift();
         }
 
-        if (!this.action) return;
-        
-        const now = performance.now();
-        const baseSpeed = (this.speedLevel * 0.4); 
-        
-        // Wheel animation
-        if (this.action.type === 'forward' || this.action.type === 'back') {
-            this.wheelSpin += baseSpeed;
-        }
-        
-        if (now >= this.action.endTime) {
-            if (this.action.type.startsWith('turn')) {
-                this.heading = this.action.targetHeading;
-            }
-            if (this.action.resolve) this.action.resolve();
-            this.action = null;
-            return;
-        }
-        
         let newX = this.x;
         let newY = this.y;
+        const now = performance.now();
 
-        if (this.action.type === 'forward') {
-            newX += Math.cos(this.heading) * baseSpeed;
-            newY += Math.sin(this.heading) * baseSpeed;
-        } else if (this.action.type === 'back') {
-            newX -= Math.cos(this.heading) * baseSpeed;
-            newY -= Math.sin(this.heading) * baseSpeed;
-        } else if (this.action.type === 'turnLeft' || this.action.type === 'turnRight') {
-            const progress = 1 - ((this.action.endTime - now) / this.action.totalTime);
-            this.heading = this.action.startHeading + (this.action.targetHeading - this.action.startHeading) * progress;
+        const dtScale = (window.simP5 && window.simP5.deltaTime) ? (window.simP5.deltaTime / 16) : 1;
+
+        if (this.action) {
+            const baseSpeed = (this.speedLevel * 0.4) * dtScale; 
+            
+            // Wheel animation
+            if (this.action.type === 'forward' || this.action.type === 'back') {
+                this.wheelSpin += baseSpeed;
+            }
+            
+            if (now >= this.action.endTime) {
+                if (this.action.type.startsWith('turn')) {
+                    this.heading = this.action.targetHeading;
+                }
+                if (this.action.resolve) this.action.resolve();
+                this.action = null;
+            } else {
+                if (this.action.type === 'forward') {
+                    newX += Math.cos(this.heading) * baseSpeed;
+                    newY += Math.sin(this.heading) * baseSpeed;
+                } else if (this.action.type === 'back') {
+                    newX -= Math.cos(this.heading) * baseSpeed;
+                    newY -= Math.sin(this.heading) * baseSpeed;
+                } else if (this.action.type.startsWith('turn')) {
+                    const progress = 1 - ((this.action.endTime - now) / this.action.totalTime);
+                    this.heading = this.action.startHeading + (this.action.targetHeading - this.action.startHeading) * progress;
+                }
+            }
+        } else if (this.motorL !== 0 || this.motorR !== 0) {
+            // Continuous differential drive
+            const maxSpeed = 3.0 * dtScale;
+            const vl = (this.motorL / 100) * maxSpeed;
+            const vr = (this.motorR / 100) * maxSpeed;
+            
+            // Average speed gives forward motion
+            const v = (vl + vr) / 2;
+            newX += Math.cos(this.heading) * v;
+            newY += Math.sin(this.heading) * v;
+            
+            // Difference in speed gives rotation
+            const trackWidth = 30; // distance between wheels
+            const omega = (vr - vl) / trackWidth;
+            this.heading += omega;
+            
+            this.wheelSpin += v;
+        } else {
+            return; // no action and no motors
         }
 
         // Check collision
-        if (!arena.checkWall(newX, newY, this.width, this.height)) {
+        const hitWall = arena.checkWall(newX, newY, this.width, this.height);
+        const hitObstacle = (arena.type === 'obstacle' || arena.type === 'line') && arena.checkObstacle && arena.checkObstacle(newX, newY, this.width, this.height);
+        
+        if (!hitWall && !hitObstacle) {
             this.x = newX;
             this.y = newY;
         } else {
             this.crashed = true;
-            if (window.showToast) window.showToast("Oops! You hit the wall!", "error");
-            if (this.action.resolve) this.action.resolve();
+            if (window.showToast) window.showToast(hitObstacle ? "Oops! You hit an obstacle!" : "Oops! You hit the wall!", "error");
+            if (this.action && this.action.resolve) this.action.resolve();
             this.action = null;
+            this.setMotors(0, 0);
         }
     }
     

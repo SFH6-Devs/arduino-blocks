@@ -23,7 +23,7 @@ export class MissionRunner {
     }
 
     offLine() {
-        this.lineTime = 0;
+        // lineTime accumulates — don't reset on momentary line loss
     }
 
     onFinish() {
@@ -40,6 +40,10 @@ export class MissionRunner {
                 return this.collisions === 0;
             case 'finish_with_turn':
                 return this.turned;
+            case 'on_line_5s':
+                return this.lineTime >= 5000;
+            case 'finish_and_on_line':
+                return this.lineTime >= 5000;
             default:
                 return false;
         }

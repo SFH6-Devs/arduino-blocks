@@ -11,9 +11,13 @@ let arena;
 let simLayer;
 let finishReported = false;
 let resizeObserver;
-let runner = new MissionRunner();
+let runner = null;
+// Expose for testing
+window.getRunner = () => runner;
+runner = new MissionRunner();
 let prevCrashed = false;
 let turnInProgress = false;
+let lastMissionId = null;
 
 const syncSimCanvas = () => {
     const simP5 = window.simP5;
@@ -60,6 +64,7 @@ const sketch = (p) => {
         arena = new Arena(simLayer, 800, 500);
         car = new Car(arena.width / 2, arena.height - 60);
         window.car = car;
+        window.arena = arena;
         window.simP5 = p;
 
         if (typeof ResizeObserver !== 'undefined') {
@@ -80,11 +85,41 @@ const sketch = (p) => {
         const offsetY = (p.height - drawH) / 2;
 
         simLayer.background(20, 22, 35);
+        
+        const mission = getActiveMission();
+        if (mission && mission.id !== lastMissionId) {
+            lastMissionId = mission.id;
+            arena.type = mission.arena;
+            resetCar();
+            finishReported = false;
+            runner.reset();
+            prevCrashed = false;
+            turnInProgress = false;
+        }
+        
         arena.draw();
         
         if (car) {
             car.update(arena);
             car.draw(simLayer);
+
+            // Update UI Sensors
+            if (p.frameCount % 5 === 0) {
+                document.getElementById('sensor-distance').innerText = `Distance: ${Math.round(car.distance())}cm`;
+                document.getElementById('sensor-line-l').innerText = `Line L: ${car.onLineLeft() ? 'YES' : 'NO'}`;
+                document.getElementById('sensor-line-r').innerText = `Line R: ${car.onLineRight() ? 'YES' : 'NO'}`;
+                // If a discrete action is running, estimate motor speeds, else use continuous motor state
+                let dispL = car.motorL;
+                let dispR = car.motorR;
+                if (car.action) {
+                    if (car.action.type === 'forward') { dispL = 50; dispR = 50; }
+                    else if (car.action.type === 'back') { dispL = -50; dispR = -50; }
+                    else if (car.action.type === 'turnLeft') { dispL = -50; dispR = 50; }
+                    else if (car.action.type === 'turnRight') { dispL = 50; dispR = -50; }
+                }
+                document.getElementById('sensor-motor-l').innerText = `Motor L: ${Math.round(dispL)}%`;
+                document.getElementById('sensor-motor-r').innerText = `Motor R: ${Math.round(dispR)}%`;
+            }
 
             if (car.crashed && !prevCrashed) {
                 runner.onCollision();
@@ -96,6 +131,28 @@ const sketch = (p) => {
                 runner.onTurn();
             }
             turnInProgress = isTurning;
+            
+            const mission = getActiveMission();
+            if (mission && mission.arena === 'line') {
+                if (car.onLineLeft() || car.onLineRight()) {
+                    if (!car.crashed && (Math.abs(car.motorL) > 0.1 || Math.abs(car.motorR) > 0.1)) {
+                        runner.onLineTick(p.deltaTime || 16);
+                    }
+                    if (runner.lineTime >= 5000 && !finishReported && !car.crashed) {
+                        if (mission && mission.pass === 'on_line_5s') {
+                            finishReported = true;
+                            car.stop();
+                            runner.onFinish();
+                            const mode = window.runMode || 'blocks';
+                            const xp = runner.getXPReward(mission, mode);
+                            addXP(xp);
+                            showChallengeComplete(mission, xp);
+                        }
+                    }
+                } else {
+                    runner.offLine();
+                }
+            }
             
             if (arena.checkFinish(car.x, car.y) && !finishReported && !car.crashed) {
                 finishReported = true;
@@ -126,10 +183,24 @@ const sketch = (p) => {
 
 new p5(sketch);
 
+function resetCar() {
+    if (car && arena) {
+        clearConsole();
+        const mission = getActiveMission();
+        if (mission && mission.arena === 'line') {
+            car.reset(400, 450);
+        } else if (mission && mission.arena === 'obstacle') {
+            car.reset(arena.width / 2, arena.height - 60);
+        } else {
+            car.reset(arena.width / 2, arena.height - 60);
+        }
+    }
+}
+
 document.getElementById('reset-btn').addEventListener('click', () => {
     if (car && arena) {
         clearConsole();
-        car.reset(arena.width / 2, arena.height - 60);
+        resetCar();
         finishReported = false;
         runner.reset();
         prevCrashed = false;

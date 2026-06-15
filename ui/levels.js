@@ -8,7 +8,12 @@ const BLOCK_UNLOCK_LEVEL = {
     wait: 3,
     distance: 4,
     if_obstacle: 4,
-    on_line: 5,
+    controls_if: 4,
+    logic_compare: 4,
+    math_number: 4,
+    on_line_left: 5,
+    on_line_right: 5,
+    set_motors: 5,
     if_on_line: 5,
     forever: 5,
     repeat_times: 5
