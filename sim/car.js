@@ -132,7 +132,7 @@ export class Car {
 
         // Check collision
         const hitWall = arena.checkWall(newX, newY, this.width, this.height);
-        const hitObstacle = (arena.type === 'obstacle' || arena.type === 'line') && arena.checkObstacle && arena.checkObstacle(newX, newY, this.width, this.height);
+        const hitObstacle = (arena.type === 'obstacle' || arena.type === 'line' || arena.type === 'turn_obstacle') && arena.checkObstacle && arena.checkObstacle(newX, newY, this.width, this.height);
         
         if (!hitWall && !hitObstacle) {
             this.x = newX;

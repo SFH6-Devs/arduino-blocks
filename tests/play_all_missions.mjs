@@ -72,8 +72,7 @@ import { chromium } from 'playwright';
                 console.log('  Failed. Car state:', await page.evaluate(() => ({
                     x: window.car.x,
                     y: window.car.y,
-                    crashed: window.car.crashed,
-                    lineTime: window.runner.lineTime
+                    crashed: window.car.crashed
                 })));
                 console.log('  Skipping to next mission manually.');
                 await page.evaluate(() => {

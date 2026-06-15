@@ -2,17 +2,13 @@ export const MISSION_SOLUTIONS = {
     m1: `<xml><block type="move_forward"><field name="TIME">10000</field></block></xml>`,
     m2: `<xml><block type="move_forward"><field name="TIME">10000</field></block></xml>`,
     m3: `<xml>
-            <block type="move_forward"><field name="TIME">500</field>
+            <block type="turn_right"><field name="DEGREES">90</field>
                 <next>
-                    <block type="turn_right"><field name="DEGREES">45</field>
+                    <block type="move_forward"><field name="TIME">1500</field>
                         <next>
-                            <block type="move_forward"><field name="TIME">3000</field>
+                            <block type="turn_left"><field name="DEGREES">90</field>
                                 <next>
-                                    <block type="turn_left"><field name="DEGREES">45</field>
-                                        <next>
-                                            <block type="move_forward"><field name="TIME">6000</field></block>
-                                        </next>
-                                    </block>
+                                    <block type="move_forward"><field name="TIME">4000</field></block>
                                 </next>
                             </block>
                         </next>
