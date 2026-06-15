@@ -78,36 +78,67 @@ export const MISSION_SOLUTIONS = {
     m6: `<xml>
             <block type="forever">
                 <statement name="DO">
-                    <block type="if_else">
-                        <value name="IF0">
-                            <block type="on_line_left"></block>
-                        </value>
-                        <statement name="DO0">
-                            <block type="if_else">
-                                <value name="IF0">
-                                    <block type="on_line_right"></block>
-                                </value>
-                                <statement name="DO0">
-                                    <block type="set_motors"><field name="SPEED_L">15</field><field name="SPEED_R">15</field></block>
-                                </statement>
-                                <statement name="ELSE">
-                                    <block type="set_motors"><field name="SPEED_L">15</field><field name="SPEED_R">0</field></block>
-                                </statement>
+                    <block type="if_obstacle">
+                        <statement name="DO">
+                            <block type="turn_left"><field name="DEGREES">90</field>
+                                <next>
+                                    <block type="move_forward"><field name="TIME">1000</field>
+                                        <next>
+                                            <block type="turn_right"><field name="DEGREES">90</field>
+                                                <next>
+                                                    <block type="move_forward"><field name="TIME">1500</field>
+                                                        <next>
+                                                            <block type="turn_right"><field name="DEGREES">90</field>
+                                                                <next>
+                                                                    <block type="move_forward"><field name="TIME">1000</field>
+                                                                        <next>
+                                                                            <block type="turn_left"><field name="DEGREES">90</field></block>
+                                                                        </next>
+                                                                    </block>
+                                                                </next>
+                                                            </block>
+                                                        </next>
+                                                    </block>
+                                                </next>
+                                            </block>
+                                        </next>
+                                    </block>
+                                </next>
                             </block>
                         </statement>
-                        <statement name="ELSE">
+                        <next>
                             <block type="if_else">
                                 <value name="IF0">
-                                    <block type="on_line_right"></block>
+                                    <block type="on_line_left"></block>
                                 </value>
                                 <statement name="DO0">
-                                    <block type="set_motors"><field name="SPEED_L">0</field><field name="SPEED_R">15</field></block>
+                                    <block type="if_else">
+                                        <value name="IF0">
+                                            <block type="on_line_right"></block>
+                                        </value>
+                                        <statement name="DO0">
+                                            <block type="set_motors"><field name="SPEED_L">15</field><field name="SPEED_R">15</field></block>
+                                        </statement>
+                                        <statement name="ELSE">
+                                            <block type="set_motors"><field name="SPEED_L">15</field><field name="SPEED_R">0</field></block>
+                                        </statement>
+                                    </block>
                                 </statement>
                                 <statement name="ELSE">
-                                    <block type="set_motors"><field name="SPEED_L">15</field><field name="SPEED_R">15</field></block>
+                                    <block type="if_else">
+                                        <value name="IF0">
+                                            <block type="on_line_right"></block>
+                                        </value>
+                                        <statement name="DO0">
+                                            <block type="set_motors"><field name="SPEED_L">0</field><field name="SPEED_R">15</field></block>
+                                        </statement>
+                                        <statement name="ELSE">
+                                            <block type="set_motors"><field name="SPEED_L">15</field><field name="SPEED_R">15</field></block>
+                                        </statement>
+                                    </block>
                                 </statement>
                             </block>
-                        </statement>
+                        </next>
                     </block>
                 </statement>
             </block>

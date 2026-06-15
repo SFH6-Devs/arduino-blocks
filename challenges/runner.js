@@ -44,7 +44,7 @@ export class MissionRunner {
             case 'on_line_5s':
                 return this.lineTime >= 5000;
             case 'finish_and_on_line':
-                return this.lineTime >= 5000;
+                return this.lineTime >= 5000 && this.collisions === 0;
             default:
                 return false;
         }
