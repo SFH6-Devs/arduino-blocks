@@ -39,6 +39,9 @@ const syncBlocklyLayout = () => {
 // Global Toast Function
 window.showToast = function(msg, type = "success") {
     const container = document.getElementById('toast-container');
+    while (container.children.length >= 3) {
+        container.firstElementChild.remove();
+    }
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
     toast.innerText = msg;
