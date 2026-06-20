@@ -335,9 +335,9 @@ export function initWorkspace() {
                     colourTertiary: '#1e6080'
                 },
                 loop_blocks: {
-                    colourPrimary: '#8b6500',
-                    colourSecondary: '#c99f00',
-                    colourTertiary: '#927300'
+                    colourPrimary: '#ffca1a',
+                    colourSecondary: '#e0ad00',
+                    colourTertiary: '#b38a00'
                 }
             },
             categoryStyles: {},
