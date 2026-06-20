@@ -300,12 +300,56 @@ export function initWorkspace() {
     blocklyDiv.style.width = '100%';
     blocklyDiv.style.height = '100%';
 
+    class FlatConstantsProvider extends Blockly.blockRendering.ConstantProvider {
+        constructor() {
+            super();
+            this.CORNER_RADIUS = 6;
+            this.NOTCH_WIDTH = 0;
+            this.NOTCH_HEIGHT = 0;
+            this.TAB_HEIGHT = 0;
+            this.TAB_WIDTH = 0;
+            this.STATEMENT_BOTTOM_SPACER = 0;
+            this.STATEMENT_INPUT_PADDING_LEFT = 16;
+        }
+
+        makeNotch() {
+            return {
+                type: 1,
+                width: 0,
+                height: 0,
+                pathLeft: 'h 0',
+                pathRight: 'h 0'
+            };
+        }
+
+        makePuzzleTab() {
+            return {
+                type: 2,
+                width: 0,
+                height: 0,
+                pathDown: 'v 0',
+                pathUp: 'v 0'
+            };
+        }
+    }
+
+    class FlatRenderer extends Blockly.blockRendering.Renderer {
+        constructor(name) {
+            super(name);
+        }
+        makeConstants_() {
+            return new FlatConstantsProvider();
+        }
+    }
+
+    Blockly.blockRendering.register('flat', FlatRenderer);
+
     const workspace = Blockly.inject(blocklyDiv, {
         toolbox: toolboxes.motion,
         scrollbars: true,
         trashcan: true,
         move: { scrollbars: true, drag: true, wheel: true },
-        renderer: 'zelos',
+        renderer: 'flat',
         theme: Blockly.Theme.defineTheme('arduinotheme', {
             base: Blockly.Themes.Classic,
             blockStyles: {
