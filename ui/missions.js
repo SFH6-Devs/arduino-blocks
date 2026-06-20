@@ -5,6 +5,22 @@ export async function loadMissions() {
     const res = await fetch('challenges/missions.json');
     missions = await res.json();
     renderMissionStrip();
+
+    const prevBtn = document.getElementById('mission-prev');
+    const nextBtn = document.getElementById('mission-next');
+    if (prevBtn) prevBtn.onclick = prevMission;
+    if (nextBtn) nextBtn.onclick = nextMission;
+
+    const strip = document.getElementById('mission-strip');
+    if (strip) {
+        strip.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                cycleMission();
+            }
+        });
+    }
+
     return missions;
 }
 
@@ -31,6 +47,12 @@ export function cycleMission() {
 export function nextMission() {
     if (missions.length === 0) return;
     activeIndex = (activeIndex + 1) % missions.length;
+    renderMissionStrip();
+}
+
+export function prevMission() {
+    if (missions.length === 0) return;
+    activeIndex = (activeIndex - 1 + missions.length) % missions.length;
     renderMissionStrip();
 }
 
@@ -86,7 +108,7 @@ export function showChallengeComplete(mission, xp) {
 
     document.getElementById('cc-mission-title').textContent = mission.title;
     document.getElementById('cc-xp-amount').textContent = `+${xp} XP`;
-    document.getElementById('cc-description').textContent = mission.description;
+    document.getElementById('cc-description').textContent = `Nice work! ${mission.description}`;
 
     const nextBtn = document.getElementById('cc-next');
     if (nextBtn) {
@@ -113,7 +135,36 @@ export function showChallengeComplete(mission, xp) {
 }
 
 export function showMissionFailed(failMsg) {
-    if (window.showToast) {
-        window.showToast(failMsg || 'Mission not passed. Try again!', 'error');
+    showMissionFailedDialog(getActiveMission(), failMsg);
+}
+
+export function showMissionFailedDialog(mission, reason) {
+    const dialog = document.getElementById('mission-failed-dialog');
+    if (!dialog) {
+        if (window.showToast) window.showToast(reason || 'Mission not passed. Try again!', 'error');
+        return;
     }
+
+    document.getElementById('mf-mission-title').textContent = mission
+        ? `${mission.title} Failed`
+        : 'Mission Failed';
+    document.getElementById('mf-reason').textContent = reason || 'Mission not passed. Try again!';
+
+    const retryBtn = document.getElementById('mf-retry');
+    const skipBtn = document.getElementById('mf-skip');
+
+    if (retryBtn) {
+        retryBtn.onclick = () => {
+            dialog.close();
+            document.getElementById('reset-btn')?.click();
+        };
+    }
+    if (skipBtn) {
+        skipBtn.onclick = () => {
+            dialog.close();
+            nextMission();
+        };
+    }
+
+    dialog.showModal();
 }

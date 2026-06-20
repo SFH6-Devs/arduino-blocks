@@ -33,7 +33,7 @@ function distToSegment(px, py, x1, y1, x2, y2) {
 }
 
 export function isOnLineLeft(car, arena) {
-    if (arena.type !== 'line' || !arena.lineSegments) return false;
+    if ((arena.type !== 'line' && arena.type !== 'line_sharp') || !arena.lineSegments) return false;
     const threshold = 30; 
     let sx = car.x + Math.cos(car.heading) * (car.height/2) + Math.cos(car.heading - Math.PI/2) * (car.width/2 - 4);
     let sy = car.y + Math.sin(car.heading) * (car.height/2) + Math.sin(car.heading - Math.PI/2) * (car.width/2 - 4);
@@ -44,7 +44,7 @@ export function isOnLineLeft(car, arena) {
 }
 
 export function isOnLineRight(car, arena) {
-    if (arena.type !== 'line' || !arena.lineSegments) return false;
+    if ((arena.type !== 'line' && arena.type !== 'line_sharp') || !arena.lineSegments) return false;
     const threshold = 30; 
     let sx = car.x + Math.cos(car.heading) * (car.height/2) + Math.cos(car.heading + Math.PI/2) * (car.width/2 - 4);
     let sy = car.y + Math.sin(car.heading) * (car.height/2) + Math.sin(car.heading + Math.PI/2) * (car.width/2 - 4);

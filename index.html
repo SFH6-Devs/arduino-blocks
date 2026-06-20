@@ -49,15 +49,19 @@
     <div id="app">
         <!-- Top Navigation / Mission Strip -->
         <header id="top-bar">
-            <div id="mission-strip">Mission 1: Drive Forward
-                <div id="mission-hint"></div>
+            <div id="mission-strip-container" role="group" aria-label="Mission navigation">
+                <button id="mission-prev" class="mission-arrow-btn" aria-label="Previous mission">◀</button>
+                <div id="mission-strip" tabindex="0" role="button" aria-label="Cycle mission">Mission 1: Drive Forward
+                    <div id="mission-hint"></div>
+                </div>
+                <button id="mission-next" class="mission-arrow-btn" aria-label="Next mission">▶</button>
             </div>
 
             <div id="controls">
                 <button id="run-btn">▶ Run</button>
                 <button id="reset-btn">↺ Reset</button>
                 <button id="solution-btn">💡 Solution</button>
-                <button id="connect-btn">Connect Car</button>
+                <button id="connect-btn" hidden>Connect Car</button>
                 <button id="settings-btn" title="Settings">⚙ Settings</button>
             </div>
             <div id="mode-toggle">
@@ -187,6 +191,19 @@
             <div class="dialog-actions">
                 <button id="cc-next" class="primary">Next Mission</button>
                 <button id="cc-close" class="secondary">Continue</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- Mission Failed Dialog -->
+    <dialog id="mission-failed-dialog">
+        <div class="dialog-content mf-dialog">
+            <div class="mf-badge">✕</div>
+            <h2 id="mf-mission-title">Mission Failed</h2>
+            <p id="mf-reason"></p>
+            <div class="dialog-actions">
+                <button id="mf-retry" class="primary">Try Again</button>
+                <button id="mf-skip" class="secondary">Skip Mission</button>
             </div>
         </div>
     </dialog>

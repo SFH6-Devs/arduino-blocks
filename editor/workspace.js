@@ -15,7 +15,7 @@ import {
     syncPythonFromWorkspace
 } from './python-editor.js';
 import { appendConsoleLine, clearConsole, writeConsoleError } from '../ui/console.js';
-import { isBlockUnlocked } from '../ui/levels.js';
+import { isBlockUnlocked, getUnlockLevel } from '../ui/levels.js';
 import { getLevel } from '../ui/xp.js';
 import { getActiveMission } from '../ui/missions.js';
 import { MISSION_SOLUTIONS } from './solutions.js';
@@ -288,6 +288,9 @@ export function initWorkspace() {
                 <h3>Reference</h3>
                 <p>${docs.note}</p>
             </article>
+            <div class="docs-locked-hint">
+                💡 Some blocks unlock as you level up — complete missions to earn XP.
+            </div>
         `;
     };
 
@@ -332,7 +335,7 @@ export function initWorkspace() {
                     colourTertiary: '#1e6080'
                 },
                 loop_blocks: {
-                    colourPrimary: '#ffca1a',
+                    colourPrimary: '#8b6500',
                     colourSecondary: '#c99f00',
                     colourTertiary: '#927300'
                 }
@@ -462,6 +465,29 @@ export function initWorkspace() {
         pythonPane.classList.toggle('active', mode === 'python');
         cppPane.classList.toggle('active', mode === 'cpp');
 
+        const solutionBtn = document.getElementById('solution-btn');
+        const runBtn = document.getElementById('run-btn');
+
+        if (mode !== 'blocks') {
+            solutionBtn.disabled = true;
+            solutionBtn.setAttribute('aria-disabled', 'true');
+        } else {
+            solutionBtn.disabled = false;
+            solutionBtn.removeAttribute('aria-disabled');
+        }
+
+        if (mode === 'cpp') {
+            runBtn.textContent = '▶ Preview';
+            runBtn.style.background = '';
+            runBtn.style.color = '';
+            runBtn.style.borderColor = '';
+        } else {
+            runBtn.textContent = '▶ Run';
+            runBtn.style.background = '';
+            runBtn.style.color = '';
+            runBtn.style.borderColor = '';
+        }
+
         modeButtons.forEach((button) => {
             button.classList.toggle('active', button.dataset.mode === mode);
         });
@@ -560,7 +586,7 @@ export function initWorkspace() {
 
     workspace.addChangeListener((event) => {
         if (event.type === Blockly.Events.BLOCK_CREATE) {
-            watermark.classList.add('hidden');
+            updateWatermark();
         }
 
         if (event.isUiEvent) return;
@@ -623,13 +649,17 @@ export function initWorkspace() {
                 block.setDisabled(!unlocked);
             }
             if (!unlocked) {
-                block.setTooltip(`Unlocks at level ${block.type === 'distance' || block.type === 'if_obstacle' ? 4 : 5}`);
+                const unlockLevel = getUnlockLevel(block.type);
+                block.setTooltip(`Unlocks at level ${unlockLevel}`);
+            } else {
+                block.setTooltip('');
             }
         });
     };
 
     applyBlockLocking();
     workspace.addChangeListener(() => applyBlockLocking());
+    window.addEventListener('xp-changed', applyBlockLocking);
 
     syncCodeFromWorkspace();
     renderDocs('motion');

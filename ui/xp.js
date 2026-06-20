@@ -40,6 +40,7 @@ export function loadXP() {
     }
     currentLevel = calcLevel(currentXP);
     updateXPBar();
+    window.dispatchEvent(new Event('xp-changed'));
 }
 
 export function saveXP() {
@@ -51,6 +52,7 @@ export function addXP(amount) {
     currentLevel = calcLevel(currentXP);
     saveXP();
     updateXPBar();
+    window.dispatchEvent(new Event('xp-changed'));
     return { xp: currentXP, level: currentLevel, leveledUp: currentLevel > (calcLevel(currentXP - amount)) };
 }
 
@@ -96,4 +98,5 @@ export function clearXP() {
     currentLevel = 1;
     localStorage.removeItem(STORAGE_KEY);
     updateXPBar();
+    window.dispatchEvent(new Event('xp-changed'));
 }

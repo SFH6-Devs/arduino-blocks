@@ -24,12 +24,20 @@ export class Arena {
             ];
         }
 
-        this.lineSegments = [
-            { x1: 400, y1: 500, x2: 400, y2: 400 },
-            { x1: 400, y1: 400, x2: 300, y2: 250 },
-            { x1: 300, y1: 250, x2: 200, y2: 150 },
-            { x1: 200, y1: 150, x2: 200, y2: 50 }
-        ];
+        if (this.type === 'line_sharp') {
+            this.lineSegments = [
+                { x1: 400, y1: 500, x2: 400, y2: 300 }, // straight up
+                { x1: 400, y1: 300, x2: 200, y2: 300 }, // sharp left cut
+                { x1: 200, y1: 300, x2: 200, y2: 50 }   // straight up to the end
+            ];
+        } else {
+            this.lineSegments = [
+                { x1: 400, y1: 500, x2: 400, y2: 400 },
+                { x1: 400, y1: 400, x2: 300, y2: 250 },
+                { x1: 300, y1: 250, x2: 200, y2: 150 },
+                { x1: 200, y1: 150, x2: 200, y2: 50 }
+            ];
+        }
     }
     
     draw() {
