@@ -300,56 +300,71 @@ export function initWorkspace() {
     blocklyDiv.style.width = '100%';
     blocklyDiv.style.height = '100%';
 
-    class FlatConstantsProvider extends Blockly.blockRendering.ConstantProvider {
+    class SoftConstantsProvider extends Blockly.blockRendering.ConstantProvider {
         constructor() {
             super();
-            this.CORNER_RADIUS = 6;
+            this.CORNER_RADIUS = 12; // Much softer, "squishy" feel
             this.NOTCH_WIDTH = 0;
             this.NOTCH_HEIGHT = 0;
             this.TAB_HEIGHT = 0;
             this.TAB_WIDTH = 0;
             this.STATEMENT_BOTTOM_SPACER = 0;
             this.STATEMENT_INPUT_PADDING_LEFT = 16;
+            this.MIN_BLOCK_HEIGHT = 48; // Taller blocks for softer feel
+            this.DUMMY_INPUT_MIN_HEIGHT = 48;
         }
 
         makeNotch() {
-            return {
-                type: 1,
-                width: 0,
-                height: 0,
-                pathLeft: 'h 0',
-                pathRight: 'h 0'
-            };
+            return { type: 1, width: 0, height: 0, pathLeft: 'h 0', pathRight: 'h 0' };
         }
 
         makePuzzleTab() {
-            return {
-                type: 2,
-                width: 0,
-                height: 0,
-                pathDown: 'v 0',
-                pathUp: 'v 0'
-            };
+            return { type: 2, width: 0, height: 0, pathDown: 'v 0', pathUp: 'v 0' };
         }
     }
 
-    class FlatRenderer extends Blockly.blockRendering.Renderer {
+    class SoftDrawer extends Blockly.blockRendering.Drawer {
+        drawTop_() {
+            const hasOut = this.info_.hasOutputConnection;
+            this.info_.hasOutputConnection = false;
+            super.drawTop_();
+            this.info_.hasOutputConnection = hasOut;
+        }
+        drawLeft_() {
+            const hasOut = this.info_.hasOutputConnection;
+            if (hasOut) this.positionOutputConnection_();
+            this.info_.hasOutputConnection = false;
+            super.drawLeft_();
+            this.info_.hasOutputConnection = hasOut;
+        }
+        drawBottom_() {
+            const hasOut = this.info_.hasOutputConnection;
+            this.info_.hasOutputConnection = false;
+            super.drawBottom_();
+            this.info_.hasOutputConnection = hasOut;
+        }
+    }
+
+    class SoftRenderer extends Blockly.blockRendering.Renderer {
         constructor(name) {
             super(name);
         }
         makeConstants_() {
-            return new FlatConstantsProvider();
+            return new SoftConstantsProvider();
+        }
+        makeDrawer_(block, info) {
+            return new SoftDrawer(block, info);
         }
     }
 
-    Blockly.blockRendering.register('flat', FlatRenderer);
+    Blockly.blockRendering.register('soft', SoftRenderer);
 
     const workspace = Blockly.inject(blocklyDiv, {
         toolbox: toolboxes.motion,
         scrollbars: true,
         trashcan: true,
         move: { scrollbars: true, drag: true, wheel: true },
-        renderer: 'flat',
+        renderer: 'soft',
         theme: Blockly.Theme.defineTheme('arduinotheme', {
             base: Blockly.Themes.Classic,
             blockStyles: {
