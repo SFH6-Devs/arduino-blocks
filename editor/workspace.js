@@ -300,18 +300,16 @@ export function initWorkspace() {
     blocklyDiv.style.width = '100%';
     blocklyDiv.style.height = '100%';
 
-    class SoftConstantsProvider extends Blockly.blockRendering.ConstantProvider {
+    class SoftConstantsProvider extends Blockly.zelos.ConstantProvider {
         constructor() {
             super();
-            this.CORNER_RADIUS = 12; // Much softer, "squishy" feel
+            this.CORNER_RADIUS = 8;
             this.NOTCH_WIDTH = 0;
             this.NOTCH_HEIGHT = 0;
             this.TAB_HEIGHT = 0;
             this.TAB_WIDTH = 0;
             this.STATEMENT_BOTTOM_SPACER = 0;
             this.STATEMENT_INPUT_PADDING_LEFT = 16;
-            this.MIN_BLOCK_HEIGHT = 48; // Taller blocks for softer feel
-            this.DUMMY_INPUT_MIN_HEIGHT = 48;
         }
 
         makeNotch() {
@@ -321,39 +319,25 @@ export function initWorkspace() {
         makePuzzleTab() {
             return { type: 2, width: 0, height: 0, pathDown: 'v 0', pathUp: 'v 0' };
         }
-    }
-
-    class SoftDrawer extends Blockly.blockRendering.Drawer {
-        drawTop_() {
-            const hasOut = this.info_.hasOutputConnection;
-            this.info_.hasOutputConnection = false;
-            super.drawTop_();
-            this.info_.hasOutputConnection = hasOut;
-        }
-        drawLeft_() {
-            const hasOut = this.info_.hasOutputConnection;
-            if (hasOut) this.positionOutputConnection_();
-            this.info_.hasOutputConnection = false;
-            super.drawLeft_();
-            this.info_.hasOutputConnection = hasOut;
-        }
-        drawBottom_() {
-            const hasOut = this.info_.hasOutputConnection;
-            this.info_.hasOutputConnection = false;
-            super.drawBottom_();
-            this.info_.hasOutputConnection = hasOut;
+        
+        // Disable hexagon shapes for booleans and pill shapes for reporters if they interfere with the flat rounded style
+        shapeFor(connection) {
+            const shape = super.shapeFor(connection);
+            // In zelos, shapeFor assigns shapes based on connection check. 
+            // We want everything to just be flat.
+            if (shape.type === this.SHAPES.HEXAGON || shape.type === this.SHAPES.ROUND) {
+                return { type: this.SHAPES.PUZZLE, width: 0, height: 0, pathDown: 'v 0', pathUp: 'v 0' };
+            }
+            return shape;
         }
     }
 
-    class SoftRenderer extends Blockly.blockRendering.Renderer {
+    class SoftRenderer extends Blockly.zelos.Renderer {
         constructor(name) {
             super(name);
         }
         makeConstants_() {
             return new SoftConstantsProvider();
-        }
-        makeDrawer_(block, info) {
-            return new SoftDrawer(block, info);
         }
     }
 
