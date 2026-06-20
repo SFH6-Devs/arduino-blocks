@@ -310,6 +310,7 @@ export function initWorkspace() {
             this.TAB_WIDTH = 0;
             this.STATEMENT_BOTTOM_SPACER = 0;
             this.STATEMENT_INPUT_PADDING_LEFT = 16;
+            this.EMPTY_INLINE_INPUT_PADDING = 32; // Fix squished empty input holes
         }
 
         makeNotch() {
@@ -324,8 +325,20 @@ export function initWorkspace() {
         shapeFor(connection) {
             const shape = super.shapeFor(connection);
             // In zelos, shapeFor assigns shapes based on connection check. 
-            // We want everything to just be flat.
+            // We want the blocks to be flat rectangles.
             if (shape.type === this.SHAPES.HEXAGON || shape.type === this.SHAPES.ROUND) {
+                // If it's an empty value input, draw a nice rounded rectangular cavity for visibility
+                if (connection.type === Blockly.INPUT_VALUE && !connection.isConnected()) {
+                    return { 
+                        type: this.SHAPES.PUZZLE, 
+                        width: 24, 
+                        height: 24, 
+                        // Draw a rounded rectangular tab (which becomes a cavity for inputs)
+                        pathDown: 'h 20 q 4 0 4 4 v 16 q 0 4 -4 4 h -20', 
+                        pathUp: 'h 20 q 4 0 4 -4 v -16 q 0 -4 -4 -4 h -20'
+                    };
+                }
+                // If it's an output connection, or a filled input, make it perfectly flat!
                 return { type: this.SHAPES.PUZZLE, width: 0, height: 0, pathDown: 'v 0', pathUp: 'v 0' };
             }
             return shape;
