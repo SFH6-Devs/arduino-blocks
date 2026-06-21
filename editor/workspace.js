@@ -25,110 +25,8 @@ import { MISSION_SOLUTIONS } from './solutions.js';
 // ============================================================================
 
 const STATE_KEY = 'arduinosim_state';
-
-const stateManager = {
-    get() {
-        try {
-            return JSON.parse(localStorage.getItem(STATE_KEY)) || {};
-        } catch {
-            return {};
-        }
-    },
-
-    set(updates) {
-        const current = this.get();
-        const updated = { ...current, ...updates };
-        localStorage.setItem(STATE_KEY, JSON.stringify(updated));
-    },
-
-    clear() {
-        localStorage.removeItem(STATE_KEY);
-    },
-
-    saveBlocksXml(workspace) {
-        const xml = Blockly.Xml.workspaceToDom(workspace);
-        const xmlStr = Blockly.Xml.domToText(xml);
-        this.set({ blocksXml: xmlStr });
-    },
-
-    loadBlocksXml(workspace) {
-        const state = this.get();
-        if (!state.blocksXml) return false;
-
-        try {
-            const xml = Blockly.utils.xml.textToDom(state.blocksXml);
-            Blockly.Xml.domToWorkspace(xml, workspace);
-            return true;
-        } catch (e) {
-            console.error('Failed to restore blocks:', e);
-            return false;
-        }
-    },
-
-    savePythonState(atEntry, userEdits) {
-        this.set({
-            pythonAtEntry: atEntry || '',
-            pythonUserEdits: userEdits || ''
-        });
-    },
-
-    getPythonState() {
-        const state = this.get();
-        return {
-            atEntry: state.pythonAtEntry || '',
-            userEdits: state.pythonUserEdits || ''
-        };
-    }
-};
-
-// ============================================================================
-// Dialog Helpers
-// ============================================================================
-
-const showModeDialog = (title, message, actions) => {
-    return new Promise((resolve) => {
-        const dialog = document.getElementById('mode-switch-dialog');
-        const titleEl = document.getElementById('dialog-title');
-        const messageEl = document.getElementById('dialog-message');
-        const primaryBtn = document.getElementById('dialog-primary');
-        const secondaryBtn = document.getElementById('dialog-secondary');
-        const cancelBtn = document.getElementById('dialog-cancel');
-
-        titleEl.textContent = title;
-        messageEl.textContent = message;
-
-        primaryBtn.textContent = actions.primary.label;
-        secondaryBtn.textContent = actions.secondary.label;
-
-        const cleanup = () => {
-            primaryBtn.removeEventListener('click', onPrimary);
-            secondaryBtn.removeEventListener('click', onSecondary);
-            cancelBtn.removeEventListener('click', onCancel);
-            dialog.close();
-        };
-
-        const onPrimary = () => {
-            cleanup();
-            resolve('primary');
-        };
-
-        const onSecondary = () => {
-            cleanup();
-            resolve('secondary');
-        };
-
-        const onCancel = () => {
-            cleanup();
-            resolve('cancel');
-        };
-
-        primaryBtn.addEventListener('click', onPrimary);
-        secondaryBtn.addEventListener('click', onSecondary);
-        cancelBtn.addEventListener('click', onCancel);
-
-        dialog.showModal();
-    });
-};
+const getState = () => { try { return JSON.parse(localStorage.getItem(STATE_KEY)) || {}; } catch { return {}; } };
+const setState = (u) => localStorage.setItem(STATE_KEY, JSON.stringify({ ...getState(), ...u }));
 
 // ============================================================================
 // Main Workspace Initialization
@@ -484,62 +382,44 @@ export function initWorkspace() {
 
         // Blocks → Python (after Python edits): offer choice
         if (previousMode === 'blocks' && mode === 'python' && isPythonEditorDirty()) {
-            const { atEntry, userEdits } = stateManager.getPythonState();
+            const { atEntry, userEdits } = { atEntry: getState().pythonAtEntry || "", userEdits: getState().pythonUserEdits || "" };
 
             if (userEdits && userEdits !== atEntry) {
-                const choice = await showModeDialog(
-                    'Which Python code would you like to use?',
-                    'You have both new blocks and previous edits.',
-                    {
-                        primary: { label: 'Use regenerated Python' },
-                        secondary: { label: 'Use your previous edits' }
-                    }
-                );
-
-                if (choice === 'cancel') return;
+                const useRegenerated = window.confirm('You have both new blocks and previous edits.\n\nClick OK to OVERWRITE with new blocks, or Cancel to KEEP your previous edits.');
 
                 window.runMode = mode;
 
-                if (choice === 'secondary') {
+                if (!useRegenerated) {
                     syncPythonFromWorkspace(userEdits, { force: true });
                 } else {
                     const pythonCode = Blockly.Python.workspaceToCode(workspace);
-                    stateManager.savePythonState(pythonCode, pythonCode);
+                    setState({ pythonAtEntry: pythonCode || "", pythonUserEdits: pythonCode || "" });
                 }
             } else {
                 window.runMode = mode;
-                stateManager.saveBlocksXml(workspace);
+                setState({ blocksXml: Blockly.Xml.domToText(Blockly.Xml.workspaceToDom(workspace)) });
                 const pythonCode = Blockly.Python.workspaceToCode(workspace);
-                stateManager.savePythonState(pythonCode, pythonCode);
+                setState({ pythonAtEntry: pythonCode || "", pythonUserEdits: pythonCode || "" });
             }
         }
         // Blocks → Python: save state
         else if (previousMode === 'blocks' && mode === 'python') {
-            stateManager.saveBlocksXml(workspace);
+            setState({ blocksXml: Blockly.Xml.domToText(Blockly.Xml.workspaceToDom(workspace)) });
             const pythonCode = Blockly.Python.workspaceToCode(workspace);
-            stateManager.savePythonState(pythonCode, pythonCode);
+            setState({ pythonAtEntry: pythonCode || "", pythonUserEdits: pythonCode || "" });
             window.runMode = mode;
         }
         // Python → Blocks: offer restore choice
         else if (previousMode === 'python' && mode === 'blocks') {
-            const hasSavedBlocks = stateManager.get().blocksXml;
+            const hasSavedBlocks = getState().blocksXml;
 
             if (hasSavedBlocks) {
-                const choice = await showModeDialog(
-                    'Restore your blocks?',
-                    'You have saved blocks from before entering Python mode.',
-                    {
-                        primary: { label: 'Restore blocks' },
-                        secondary: { label: 'Start fresh' }
-                    }
-                );
-
-                if (choice === 'cancel') return;
+                const restore = window.confirm('You have saved blocks from before entering Python mode.\n\nClick OK to restore them, or Cancel to start fresh.');
 
                 window.runMode = mode;
 
-                if (choice === 'primary') {
-                    stateManager.loadBlocksXml(workspace);
+                if (restore) {
+                    try { Blockly.Xml.domToWorkspace(Blockly.utils.xml.textToDom(getState().blocksXml), workspace); } catch (e) { console.error("Failed to restore blocks:", e); };
                 } else {
                     workspace.clear();
                 }
@@ -719,7 +599,7 @@ export function initWorkspace() {
 
     document.getElementById('clear-state-btn').addEventListener('click', () => {
         if (confirm('Are you sure you want to clear all saved state? This cannot be undone.')) {
-            stateManager.clear();
+            localStorage.removeItem(STATE_KEY);
             workspace.clear();
             document.getElementById('settings-dialog').close();
             if (window.showToast) window.showToast('All saved state cleared', 'success');

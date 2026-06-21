@@ -245,8 +245,6 @@ document.addEventListener("DOMContentLoaded", () => {
     let rightPanelWidth = 400;
     let activeDrag = null;
 
-    const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
-
     const syncBlockly = () => {
         syncBlocklyLayout();
     };
@@ -279,10 +277,10 @@ document.addEventListener("DOMContentLoaded", () => {
             const rect = workspaceContainer.getBoundingClientRect();
             if (side === 'left') {
                 const width = ev.clientX - rect.left;
-                leftPanelWidth = clamp(width, 180, 320);
+                leftPanelWidth = Math.min(Math.max(width, 180), 320);
             } else {
                 const width = rect.right - ev.clientX;
-                rightPanelWidth = clamp(width, 330, 480);
+                rightPanelWidth = Math.min(Math.max(width, 330), 480);
             }
             applyPanelSizes();
         };
