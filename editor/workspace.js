@@ -293,7 +293,6 @@ export function initWorkspace() {
             </div>
         `;
     };
-
     blocklyDiv.style.position = 'absolute';
     blocklyDiv.style.top = '0';
     blocklyDiv.style.left = '0';
@@ -308,9 +307,8 @@ export function initWorkspace() {
             this.NOTCH_HEIGHT = 0;
             this.TAB_HEIGHT = 0;
             this.TAB_WIDTH = 0;
-            this.STATEMENT_BOTTOM_SPACER = 0;
-            this.STATEMENT_INPUT_PADDING_LEFT = 16;
-            this.EMPTY_INLINE_INPUT_PADDING = 32; // Fix squished empty input holes
+            this.MIN_BLOCK_HEIGHT = 48; // Taller blocks for soft UI
+            this.EMPTY_INLINE_INPUT_PADDING = 32;
         }
 
         makeNotch() {
@@ -320,37 +318,64 @@ export function initWorkspace() {
         makePuzzleTab() {
             return { type: 2, width: 0, height: 0, pathDown: 'v 0', pathUp: 'v 0' };
         }
-        
-        // Disable hexagon shapes for booleans and pill shapes for reporters if they interfere with the flat rounded style
-        shapeFor(connection) {
-            let shape = { type: 1, width: 0, height: 0, pathDown: 'v 0', pathUp: 'v 0' };
-            try {
-                shape = super.shapeFor(connection);
-            } catch (e) {
-                console.error(e);
-            }
 
-            try {
-                if (shape && (shape.type === this.SHAPES.HEXAGON || shape.type === this.SHAPES.ROUND)) {
-                    // Check if it's an empty value input
-                    const isInput = connection && connection.type === Blockly.INPUT_VALUE;
-                    const isConnected = connection && typeof connection.isConnected === 'function' && connection.isConnected();
-                    
-                    if (isInput && !isConnected) {
-                        return { 
-                            type: this.SHAPES.PUZZLE, 
-                            width: 24, 
-                            height: 24, 
-                            // Draw a rounded rectangular tab (which becomes a cavity for inputs)
-                            pathDown: 'h 20 q 4 0 4 4 v 16 q 0 4 -4 4 h -20', 
-                            pathUp: 'h 20 q 4 0 4 -4 v -16 q 0 -4 -4 -4 h -20'
-                        };
-                    }
-                    // If it's an output connection, or a filled input, make it perfectly flat!
-                    return { type: this.SHAPES.PUZZLE, width: 0, height: 0, pathDown: 'v 0', pathUp: 'v 0' };
+        init() {
+            super.init();
+            
+            // Force Hexagon and Round blocks to use the standard squircle corners!
+            this.HEXAGON_TOP_LEFT_CORNER = this.TOP_LEFT_CORNER;
+            this.HEXAGON_BOTTOM_LEFT_CORNER = this.BOTTOM_LEFT_CORNER;
+            this.HEXAGON_TOP_RIGHT_CORNER = this.TOP_RIGHT_CORNER;
+            this.HEXAGON_BOTTOM_RIGHT_CORNER = this.BOTTOM_RIGHT_CORNER;
+            
+            this.ROUND_TOP_LEFT_CORNER = this.TOP_LEFT_CORNER;
+            this.ROUND_BOTTOM_LEFT_CORNER = this.BOTTOM_LEFT_CORNER;
+            this.ROUND_TOP_RIGHT_CORNER = this.TOP_RIGHT_CORNER;
+            this.ROUND_BOTTOM_RIGHT_CORNER = this.BOTTOM_RIGHT_CORNER;
+            
+            // For the straight edges between the corners, use a vertical line
+            const flatPath = function(height) { return 'v ' + height; };
+            const flatPathUp = function(height) { return 'v -' + height; };
+            const zeroWidth = function() { return 0; };
+            
+            if (this.HEXAGONAL) {
+                this.HEXAGONAL.pathDown = flatPath;
+                this.HEXAGONAL.pathUp = flatPathUp;
+                this.HEXAGONAL.pathRightDown = flatPath;
+                this.HEXAGONAL.pathRightUp = flatPathUp;
+                this.HEXAGONAL.width = zeroWidth;
+            }
+            
+            if (this.ROUNDED) {
+                this.ROUNDED.pathDown = flatPath;
+                this.ROUNDED.pathUp = flatPathUp;
+                this.ROUNDED.pathRightDown = flatPath;
+                this.ROUNDED.pathRightUp = flatPathUp;
+                this.ROUNDED.width = zeroWidth;
+            }
+        }
+
+        shapeFor(connection) {
+            let shape = super.shapeFor(connection);
+
+            if (shape && (shape.type === this.SHAPES.HEXAGON || shape.type === this.SHAPES.ROUND)) {
+                const isInput = connection && connection.type === Blockly.INPUT_VALUE;
+                const isConnected = connection && typeof connection.isConnected === 'function' && connection.isConnected();
+                
+                if (isInput && !isConnected) {
+                    return { 
+                        type: shape.type,
+                        isDynamic: true,
+                        width: function(height) { return 8; },
+                        height: function(height) { return height; },
+                        connectionOffsetY: function(height) { return height / 2; },
+                        connectionOffsetX: function(width) { return 0; },
+                        pathDown: function(height) { return 'q -4 0 -4 4 v ' + Math.max(0, height - 8) + ' q 0 4 4 4'; },
+                        pathUp: function(height) { return 'q -4 0 -4 -4 v -' + Math.max(0, height - 8) + ' q 0 -4 4 -4'; },
+                        pathRightDown: function(height) { return 'q 4 0 4 4 v ' + Math.max(0, height - 8) + ' q 0 4 -4 4'; },
+                        pathRightUp: function(height) { return 'q 4 0 4 -4 v -' + Math.max(0, height - 8) + ' q 0 -4 -4 -4'; }
+                    };
                 }
-            } catch (e) {
-                console.error(e);
             }
             return shape;
         }
