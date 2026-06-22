@@ -219,40 +219,22 @@ export function initWorkspace() {
 
         init() {
             super.init();
-            
-            // Force value blocks to use standard square rendering (which will pick up our squircle corners!)
-            this.SHAPES.HEXAGON = this.SHAPES.SQUARE;
-            this.SHAPES.ROUND = this.SHAPES.SQUARE;
         }
 
         shapeFor(connection) {
-            let shape = super.shapeFor(connection);
-
-            if (connection && connection.type === Blockly.OUTPUT_VALUE) {
-                // Return a zero-width puzzle tab so blockly draws normal corners!
-                return this.makePuzzleTab();
+            const checks = connection.getCheck ? connection.getCheck() : null;
+            switch (connection.type) {
+                case Blockly.INPUT_VALUE:
+                case Blockly.OUTPUT_VALUE:
+                    // Reporter (Number) and boolean (Boolean) blocks: return a zero-width
+                    // static shape so Zelos draws plain squircle corners instead of HEXAGONAL/ROUNDED
+                    if (checks && (checks.includes('Number') || checks.includes('Boolean'))) {
+                        return { type: 2, isDynamic: false, width: 0, height: 0, pathDown: 'v 0', pathUp: 'v 0' };
+                    }
+                    return super.shapeFor(connection);
+                default:
+                    return super.shapeFor(connection);
             }
-
-            if (shape && (shape.type === this.SHAPES.HEXAGON || shape.type === this.SHAPES.ROUND)) {
-                const isInput = connection && connection.type === Blockly.INPUT_VALUE;
-                const isConnected = connection && typeof connection.isConnected === 'function' && connection.isConnected();
-                
-                if (isInput && !isConnected) {
-                    return { 
-                        type: shape.type,
-                        isDynamic: true,
-                        width: function(height) { return 8; },
-                        height: function(height) { return height; },
-                        connectionOffsetY: function(height) { return height / 2; },
-                        connectionOffsetX: function(width) { return 0; },
-                        pathDown: function(height) { return 'q -4 0 -4 4 v ' + Math.max(0, height - 8) + ' q 0 4 4 4'; },
-                        pathUp: function(height) { return 'q -4 0 -4 -4 v -' + Math.max(0, height - 8) + ' q 0 -4 4 -4'; },
-                        pathRightDown: function(height) { return 'q 4 0 4 4 v ' + Math.max(0, height - 8) + ' q 0 4 -4 4'; },
-                        pathRightUp: function(height) { return 'q 4 0 4 -4 v -' + Math.max(0, height - 8) + ' q 0 -4 -4 -4'; }
-                    };
-                }
-            }
-            return shape;
         }
     }
 

@@ -114,7 +114,7 @@ export function defineBlocks() {
         {
             "type": "distance",
             "message0": "📏 distance",
-            "output": null,
+            "output": "Number",
             "style": "sensing_blocks"
         },
         {
@@ -131,13 +131,13 @@ export function defineBlocks() {
         {
             "type": "on_line_left",
             "message0": "👁️ Left on line?",
-            "output": null,
+            "output": "Boolean",
             "style": "sensing_blocks"
         },
         {
             "type": "on_line_right",
             "message0": "👁️ Right on line?",
-            "output": null,
+            "output": "Boolean",
             "style": "sensing_blocks"
         },
         {
