@@ -220,52 +220,18 @@ export function initWorkspace() {
         init() {
             super.init();
             
-            // Force Hexagon and Round blocks to use the standard squircle corners!
-            this.HEXAGON_TOP_LEFT_CORNER = this.TOP_LEFT_CORNER;
-            this.HEXAGON_BOTTOM_LEFT_CORNER = this.BOTTOM_LEFT_CORNER;
-            this.HEXAGON_TOP_RIGHT_CORNER = this.TOP_RIGHT_CORNER;
-            this.HEXAGON_BOTTOM_RIGHT_CORNER = this.BOTTOM_RIGHT_CORNER;
-            
-            this.ROUND_TOP_LEFT_CORNER = this.TOP_LEFT_CORNER;
-            this.ROUND_BOTTOM_LEFT_CORNER = this.BOTTOM_LEFT_CORNER;
-            this.ROUND_TOP_RIGHT_CORNER = this.TOP_RIGHT_CORNER;
-            this.ROUND_BOTTOM_RIGHT_CORNER = this.BOTTOM_RIGHT_CORNER;
-            
-            // Log the original ROUNDED functions to see the exact SVG syntax zelos expects!
-            console.log("ORIGINAL ROUNDED:", {
-                width: this.ROUNDED.width(),
-                pathDown: typeof this.ROUNDED.pathDown === 'function' ? this.ROUNDED.pathDown(50) : this.ROUNDED.pathDown,
-                pathUp: typeof this.ROUNDED.pathUp === 'function' ? this.ROUNDED.pathUp(50) : this.ROUNDED.pathUp
-            });
-
-            // For the straight edges between the corners, use a vertical line
-            const capWidth = function(height) { return 8; };
-            const pathDown = function(height) { return 'a 8 8 0 0,0 -8,8 v ' + Math.max(0, height - 16) + ' a 8 8 0 0,0 8,8'; };
-            const pathUp = function(height) { return 'a 8 8 0 0,1 -8,-8 v -' + Math.max(0, height - 16) + ' a 8 8 0 0,1 8,-8'; };
-            const pathRightDown = function(height) { return 'a 8 8 0 0,1 8,8 v ' + Math.max(0, height - 16) + ' a 8 8 0 0,1 -8,8'; };
-            const pathRightUp = function(height) { return 'a 8 8 0 0,0 8,-8 v -' + Math.max(0, height - 16) + ' a 8 8 0 0,0 -8,-8'; };
-            
-            if (this.HEXAGONAL) {
-                this.HEXAGONAL.isDynamic = true;
-                this.HEXAGONAL.pathDown = pathDown;
-                this.HEXAGONAL.pathUp = pathUp;
-                this.HEXAGONAL.pathRightDown = pathRightDown;
-                this.HEXAGONAL.pathRightUp = pathRightUp;
-                this.HEXAGONAL.width = capWidth;
-            }
-            
-            if (this.ROUNDED) {
-                this.ROUNDED.isDynamic = true;
-                this.ROUNDED.pathDown = pathDown;
-                this.ROUNDED.pathUp = pathUp;
-                this.ROUNDED.pathRightDown = pathRightDown;
-                this.ROUNDED.pathRightUp = pathRightUp;
-                this.ROUNDED.width = capWidth;
-            }
+            // Force value blocks to use standard square rendering (which will pick up our squircle corners!)
+            this.SHAPES.HEXAGON = this.SHAPES.SQUARE;
+            this.SHAPES.ROUND = this.SHAPES.SQUARE;
         }
 
         shapeFor(connection) {
             let shape = super.shapeFor(connection);
+
+            if (connection && connection.type === Blockly.OUTPUT_VALUE) {
+                // Return a zero-width puzzle tab so blockly draws normal corners!
+                return this.makePuzzleTab();
+            }
 
             if (shape && (shape.type === this.SHAPES.HEXAGON || shape.type === this.SHAPES.ROUND)) {
                 const isInput = connection && connection.type === Blockly.INPUT_VALUE;
