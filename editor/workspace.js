@@ -232,24 +232,34 @@ export function initWorkspace() {
             this.ROUND_BOTTOM_RIGHT_CORNER = this.BOTTOM_RIGHT_CORNER;
             
             // For the straight edges between the corners, use a vertical line
-            const flatPath = function(height) { return 'v ' + height; };
-            const flatPathUp = function(height) { return 'v -' + height; };
-            const zeroWidth = function() { return 0; };
+            const widthFunc = function() { return 8; };
+            const pathDown = function(height) { 
+                return 'a 8 8 0 0 0 -8 8 v ' + Math.max(0, height - 16) + ' a 8 8 0 0 0 8 8'; 
+            };
+            const pathUp = function(height) { 
+                return 'a 8 8 0 0 1 -8 -8 v -' + Math.max(0, height - 16) + ' a 8 8 0 0 1 8 -8'; 
+            };
+            const pathRightDown = function(height) { 
+                return 'a 8 8 0 0 1 8 8 v ' + Math.max(0, height - 16) + ' a 8 8 0 0 1 -8 8'; 
+            };
+            const pathRightUp = function(height) { 
+                return 'a 8 8 0 0 0 8 -8 v -' + Math.max(0, height - 16) + ' a 8 8 0 0 0 -8 -8'; 
+            };
             
             if (this.HEXAGONAL) {
-                this.HEXAGONAL.pathDown = flatPath;
-                this.HEXAGONAL.pathUp = flatPathUp;
-                this.HEXAGONAL.pathRightDown = flatPath;
-                this.HEXAGONAL.pathRightUp = flatPathUp;
-                this.HEXAGONAL.width = zeroWidth;
+                this.HEXAGONAL.pathDown = pathDown;
+                this.HEXAGONAL.pathUp = pathUp;
+                this.HEXAGONAL.pathRightDown = pathRightDown;
+                this.HEXAGONAL.pathRightUp = pathRightUp;
+                this.HEXAGONAL.width = widthFunc;
             }
             
             if (this.ROUNDED) {
-                this.ROUNDED.pathDown = flatPath;
-                this.ROUNDED.pathUp = flatPathUp;
-                this.ROUNDED.pathRightDown = flatPath;
-                this.ROUNDED.pathRightUp = flatPathUp;
-                this.ROUNDED.width = zeroWidth;
+                this.ROUNDED.pathDown = pathDown;
+                this.ROUNDED.pathUp = pathUp;
+                this.ROUNDED.pathRightDown = pathRightDown;
+                this.ROUNDED.pathRightUp = pathRightUp;
+                this.ROUNDED.width = widthFunc;
             }
         }
 
