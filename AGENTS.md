@@ -48,6 +48,10 @@ naive version first. Verify correctness. Then optimize. Never merge these steps.
 If you've written 200 lines and suspect it could be 50, it can be 50. Rewrite it.
 Ask yourself: "Would a senior engineer call this bloated?" If yes, cut.
 
+YAGNI: Build only what the current task requires. Don't add hooks, config, or abstractions for hypothetical future needs.
+
+That keeps the file lean and ties 
+
 ---
 
 ## 3. Surgical Changes Only
@@ -108,5 +112,4 @@ Agreement that you don't mean is noise. It costs them time later.
 | "Optimized" code that may be wrong           | § 2 — naive first               |
 | Presenting incomplete work as done           | § 4 — loop until criteria met   |
 | Agreeing with a bad approach                 | § 5 — flag it once, directly    |
-
-Also no cringey emojis when not necessary 
+| We might need this later                     | §2 — YAGNI                      |
