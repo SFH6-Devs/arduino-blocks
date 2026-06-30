@@ -50,7 +50,7 @@ Ask yourself: "Would a senior engineer call this bloated?" If yes, cut.
 
 YAGNI: Build only what the current task requires. Don't add hooks, config, or abstractions for hypothetical future needs.
 
-That keeps the file lean and ties 
+That keeps the codebase lean and ties every change directly to the user's request.
 
 ---
 
